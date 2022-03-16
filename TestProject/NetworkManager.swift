@@ -10,7 +10,8 @@ import Foundation
 
 enum ErrorMessage: String, Error {
     case unableToDecode = "unableToDecode"
-    case alreadyExist = "Item is already in the cart"
+    case alreadyCheckedIn = "Your stop is checked"
+    case isEmpty = "Nothing to delete"
 }
 
 enum NetworkHandler {
@@ -34,15 +35,19 @@ enum NetworkManager {
                 switch actionType {
                 case .add:
                     guard !retreivedItems.contains(where: {$0 == WorkFlowItem} ) else {
-                        completed(.alreadyExist)
+                        completed(.alreadyCheckedIn)
                         return
                     }
                     retreivedItems.append(WorkFlowItem)
                 case .remove:
-                    retreivedItems.removeAll { $0.milesstoneId == WorkFlowItem.milesstoneId }
+                    guard !retreivedItems.isEmpty else {
+                        completed(.isEmpty)
+                        return
+                    }
+                    retreivedItems.removeAll()
                 }
                 
-                completed(addToCart(items: retreivedItems))
+                completed(completeChecking(milestones: retreivedItems))
                 
             case .failure(let error):
                 completed(error)
@@ -64,10 +69,10 @@ enum NetworkManager {
         }
     }
     
-    static func addToCart(items:  [WorkFlow]) -> ErrorMessage? {
+    static func completeChecking(milestones:  [WorkFlow]) -> ErrorMessage? {
         do{
             let encoder = JSONEncoder()
-            let encodedItems = try encoder.encode(items)
+            let encodedItems = try encoder.encode(milestones)
             defaults.set(encodedItems, forKey: Keys.milestone)
             return nil
         } catch {

@@ -28,7 +28,7 @@ class ContentViewModel {
     
     func checkIn(item: WorkFlow, vc: UIViewController, completion: @escaping (Bool) -> Void) {
         vc.showLoadingView()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
         NetworkManager.updateWith(WorkFlowItem: item, actionType: .add) { error in
             vc.dismissLoadingView()
             guard let error = error else {
@@ -44,7 +44,7 @@ class ContentViewModel {
     
     func deleteAll(item: WorkFlow, vc: UIViewController, completion: @escaping (Bool) -> Void) {
         vc.showLoadingView()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             NetworkManager.updateWith(WorkFlowItem: item, actionType: .remove) { error in
                 vc.dismissLoadingView()
                 guard let error = error else {
@@ -193,11 +193,13 @@ class ViewController: UIViewController {
     }
     
     private func changeVisibility(hidden: Bool = true) {
+        self.deleteButton.isHidden = hidden
         guard let milestones = self.viewModel?.checkInMilestone else { return }
         milestones.forEach({
             if $0.milestoneCompleted ?? false {
                 dateLabel.isHidden = !hidden
                 datePicker.isHidden = !hidden
+                deleteButton.isHidden = !hidden
             } else {
                 dateLabel.isHidden = hidden
                 datePicker.isHidden = hidden
@@ -253,7 +255,7 @@ class ViewController: UIViewController {
         dateLabel.leadingAnchor == datePickerView.leadingAnchor + padding
         
         datePicker.topAnchor == datePickerView.topAnchor
-        datePicker.leadingAnchor == datePickerView.leadingAnchor
+        datePicker.leadingAnchor == datePickerView.centerXAnchor - padding
         datePicker.trailingAnchor == datePickerView.trailingAnchor
         datePicker.heightAnchor == 80
         
@@ -273,13 +275,23 @@ extension ViewController {
     @objc private func deleteAll() {
         guard let milestones = self.viewModel?.checkInMilestone else { return }
         for milestone in milestones {
+            self.deleteButton.isHidden = false
             self.viewModel?.deleteAll(item: milestone, vc: self, completion: { deleted in
-                self.customAlert(title: "Deleted", message: "Deleted", buttonTitle: "ok")
-                self.checkInToggle.isEnabled = true
-                self.datePicker.isEnabled = true
-                self.submitButton.setTitle("Submit", for: .normal)
-                self.submitButton.backgroundColor = .systemBlue
-                self.submitButton.isEnabled = true
+                
+                switch deleted {
+                case true:
+                    self.customAlert(title: "Deleted", message: "Deleted", buttonTitle: "ok")
+                    self.checkInToggle.isEnabled = true
+                    self.datePicker.isEnabled = true
+                    self.datePicker.date = Date()
+                    self.submitButton.setTitle("Submit", for: .normal)
+                    self.submitButton.backgroundColor = .systemBlue
+                    self.submitButton.isEnabled = true
+                case false:
+//                    break
+                    self.deleteButton.isHidden = true
+                }
+                
             })
         }
     }
@@ -294,6 +306,7 @@ extension ViewController {
         self.viewModel?.checkIn(item: item, vc: self, completion: { saved in
             switch saved {
             case true:
+                self.deleteButton.isHidden = false
                 self.checkInToggle.isEnabled = false
                 self.datePicker.isEnabled = false
                 self.submitButton.setTitle("Submitted", for: .normal)
