@@ -26,15 +26,35 @@ class ContentViewModel {
         }
     }
     
-    func checkIn(item: WorkFlow, vc: UIViewController) {
+    func checkIn(item: WorkFlow, vc: UIViewController, completion: @escaping (Bool) -> Void) {
         vc.showLoadingView()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
         NetworkManager.updateWith(WorkFlowItem: item, actionType: .add) { error in
             vc.dismissLoadingView()
             guard let error = error else {
                 vc.customAlert(title: "Success!...", message: "Milestone Completed...", buttonTitle: "Okay")
+                completion(true)
                 return
             }
             vc.customAlert(title: "Something went wrong...", message: error.rawValue, buttonTitle: "Ok")
+        }
+        completion(false)
+        }
+    }
+    
+    func deleteAll(item: WorkFlow, vc: UIViewController, completion: @escaping (Bool) -> Void) {
+        vc.showLoadingView()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            NetworkManager.updateWith(WorkFlowItem: item, actionType: .remove) { error in
+                vc.dismissLoadingView()
+                guard let error = error else {
+                    vc.customAlert(title: "Success!...", message: "Milestone Deleted...", buttonTitle: "Okay")
+                    completion(true)
+                    return
+                }
+                vc.customAlert(title: "Something went wrong...", message: error.rawValue, buttonTitle: "Ok")
+            }
+            completion(false)
         }
     }
 }
@@ -51,8 +71,10 @@ class ViewController: UIViewController {
                     self.checkingLabel.text = "Already checked in"
                     checkInToggle.isOn = true
                     checkInToggle.isEnabled = false
-                    submitButton.setTitle("Loaded", for: .normal)
+                    submitButton.setTitle("Submited", for: .normal)
                     submitButton.isEnabled = false
+                    submitButton.backgroundColor = .clear
+                    submitButton.setTitleColor(.systemBlue, for: .disabled)
                     if let date = milestone.checkinDate {
                         datePicker.date = date
                         datePicker.isEnabled = false
@@ -62,9 +84,15 @@ class ViewController: UIViewController {
         }
     }
     
+    lazy var stopLabel: UILabel = {
+        let label = CustomTitleLabel(textAlignment: .left, fontSize: 16, text: "Pick 1 - Walmart Supercenter")
+        return label
+    }()
+    
     //MARK: - Toggle Button
     lazy var checkingLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 14, text: "Check In")
+        label.backgroundColor = .white
         return label
     }()
     
@@ -83,10 +111,17 @@ class ViewController: UIViewController {
     private var toggleChanged: Bool = false {
         didSet {
             checkInToggle.isOn = toggleChanged
+            changeVisibility(hidden: !toggleChanged)
         }
     }
     
     //MARK: - Date Picker
+    
+    lazy var dateLabel: UILabel = {
+        let label = CustomTitleLabel(textAlignment: .left, fontSize: 14, text: "Time")
+        return label
+    }()
+    
     lazy var datePicker: UIDatePicker = {
         let picker = UIDatePicker()
         picker.datePickerMode = .dateAndTime
@@ -121,22 +156,7 @@ class ViewController: UIViewController {
         return btn
     }()
     
-    @objc private func deleteAll() {
-        deleteData()
-    }
-    
-    @objc private func checkInButtonTapped(_ sender: UIButton) {
-        guard toggleChanged && checkinDate != nil else {
-            print("Check the input")
-            return
-        }
-        let item = WorkFlow(milesstoneId: 1, checkinDate: self.checkinDate, milestoneCompleted: self.toggleChanged)
-        print(item)
-        self.viewModel?.checkIn(item: item, vc: self)
-    }
-    
-    
-    lazy var componentsStackView: UIStackView = {
+    lazy var checkInLabelsStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [checkingLabel, checkInToggle])
         stack.distribution = .equalSpacing
         stack.spacing = 10
@@ -146,28 +166,43 @@ class ViewController: UIViewController {
     
     lazy var checkInView: UIView = {
         let view = UIView()
-        view.addSubview(checkingLabel)
-        view.addSubview(checkInToggle)
-        view.addSubview(datePicker)
-        view.addSubview(componentsStackView)
-        view.addSubview(submitButton)
-        view.addSubview(deleteButton)
-        view.layer.borderWidth = 0.5
-        view.layer.cornerRadius = 16
-        view.backgroundColor = .systemGray6
+        view.addSubview(checkInLabelsStack)
+        view.layer.borderWidth = 0.2
+        view.backgroundColor = .white
         return view
     }()
     
-    weak var delegate: Delegate?
+    lazy var datePickerView: UIView = {
+        let view = UIView()
+        view.addSubview(dateLabel)
+        view.addSubview(datePicker)
+        view.layer.borderWidth = 0.2
+        view.backgroundColor = .white
+        return view
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = "Work Flow"
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = .systemGray6
         configure()
         initContentViewModel()
         loadData()
+        changeVisibility()
+    }
+    
+    private func changeVisibility(hidden: Bool = true) {
+        guard let milestones = self.viewModel?.checkInMilestone else { return }
+        milestones.forEach({
+            if $0.milestoneCompleted ?? false {
+                dateLabel.isHidden = !hidden
+                datePicker.isHidden = !hidden
+            } else {
+                dateLabel.isHidden = hidden
+                datePicker.isHidden = hidden
+            }
+        })
     }
 
     private func initContentViewModel() {
@@ -188,49 +223,92 @@ class ViewController: UIViewController {
             }
     }
     
-    private func deleteData() {
-        guard let milestones = self.viewModel?.checkInMilestone else { return }
-        for milestone in milestones {
-                NetworkManager.updateWith(WorkFlowItem: milestone, actionType: .remove, completed: {error in
-                    print(error)
-                    print("completed")
-                })
-        }
-    }
-    
     private func configure() {
+        view.addSubview(stopLabel)
         view.addSubview(checkInView)
+        view.addSubview(datePickerView)
+        view.addSubview(submitButton)
+        view.addSubview(deleteButton)
         setupConstraints()
     }
     
     func setupConstraints() {
-        checkInView.topAnchor == view.topAnchor + 100
-        checkInView.horizontalAnchors == view.horizontalAnchors + 20
-        checkInView.heightAnchor == view.heightAnchor / 4
-        
         let padding: CGFloat = 20
-        componentsStackView.topAnchor == checkInView.topAnchor + padding
-        componentsStackView.horizontalAnchors == checkInView.horizontalAnchors + padding
         
-        datePicker.topAnchor == componentsStackView.bottomAnchor + padding
-        datePicker.leadingAnchor == checkInView.leadingAnchor
-        datePicker.trailingAnchor == checkInView.trailingAnchor
+        stopLabel.topAnchor == view.topAnchor + 100
+        stopLabel.leadingAnchor == view.leadingAnchor + padding
+        
+        checkInView.topAnchor == stopLabel.bottomAnchor + padding
+        checkInView.horizontalAnchors == view.horizontalAnchors
+        checkInView.heightAnchor == 70
+        
+        checkInLabelsStack.topAnchor == checkInView.topAnchor + padding
+        checkInLabelsStack.horizontalAnchors == checkInView.horizontalAnchors + padding
+        
+        datePickerView.topAnchor == checkInView.bottomAnchor
+        datePickerView.horizontalAnchors == view.horizontalAnchors
+        datePickerView.heightAnchor == 80
+        
+        dateLabel.centerYAnchor == datePicker.centerYAnchor
+        dateLabel.leadingAnchor == datePickerView.leadingAnchor + padding
+        
+        datePicker.topAnchor == datePickerView.topAnchor
+        datePicker.leadingAnchor == datePickerView.leadingAnchor
+        datePicker.trailingAnchor == datePickerView.trailingAnchor
         datePicker.heightAnchor == 80
         
-        submitButton.topAnchor == datePicker.bottomAnchor + 10
-        submitButton.centerXAnchor == checkInView.centerXAnchor
+        submitButton.topAnchor == datePickerView.bottomAnchor + 10
+        submitButton.centerXAnchor == view.centerXAnchor
         submitButton.widthAnchor == 100
         
         deleteButton.topAnchor == submitButton.bottomAnchor + 10
-        deleteButton.trailingAnchor == checkInView.trailingAnchor -  10
-        deleteButton.bottomAnchor == checkInView.bottomAnchor - 10
+        deleteButton.trailingAnchor == view.trailingAnchor -  10
         deleteButton.widthAnchor == 70
     }
     
 }
 
+//MARK: - Actions
+extension ViewController {
+    @objc private func deleteAll() {
+        guard let milestones = self.viewModel?.checkInMilestone else { return }
+        for milestone in milestones {
+            self.viewModel?.deleteAll(item: milestone, vc: self, completion: { deleted in
+                self.customAlert(title: "Deleted", message: "Deleted", buttonTitle: "ok")
+                self.checkInToggle.isEnabled = true
+                self.datePicker.isEnabled = true
+                self.submitButton.setTitle("Submit", for: .normal)
+                self.submitButton.backgroundColor = .systemBlue
+                self.submitButton.isEnabled = true
+            })
+        }
+    }
+    
+    @objc private func checkInButtonTapped(_ sender: UIButton) {
+        guard toggleChanged && checkinDate != nil else {
+            self.customAlert(title: "Choose Date ", message: "Trya again", buttonTitle: "ok")
+            return
+        }
+        let item = WorkFlow(milesstoneId: 1, checkinDate: self.checkinDate, milestoneCompleted: self.toggleChanged)
+        print(item)
+        self.viewModel?.checkIn(item: item, vc: self, completion: { saved in
+            switch saved {
+            case true:
+                self.checkInToggle.isEnabled = false
+                self.datePicker.isEnabled = false
+                self.submitButton.setTitle("Submitted", for: .normal)
+                self.submitButton.setTitleColor(.systemBlue, for: .disabled)
+                self.submitButton.backgroundColor = .clear
+                self.submitButton.isEnabled = false
+            case false:
+                break
+            }
+            
+        })
+    }
+}
 
-
+/*
 extension ViewController: Actionable {
     enum Action {
         case deleteList(list: String)
@@ -282,3 +360,4 @@ public typealias VoidClosure = () -> Void
 //
 //    open func setup() {}
 //}
+*/
