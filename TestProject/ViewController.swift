@@ -11,9 +11,19 @@ import Anchorage
 
 //MARK: MODEL
 struct WorkFlow: Codable, Hashable {
+    
+    //CHECKIN MILESTONE
     var milesstoneId: Int?
     var checkinDate: Date?
     var milestoneCompleted: Bool?
+    
+    //LOADED MILESTONE
+//    var loadedId: Int?
+//    var answer: String
+    
+    //
+    
+    
 }
 
 //MARK: CONTENTVIEWMODEL
@@ -302,7 +312,7 @@ extension ViewController {
             return
         }
         let item = WorkFlow(milesstoneId: 1, checkinDate: self.checkinDate, milestoneCompleted: self.toggleChanged)
-        print(item)
+        print("printing this item ", item)
         self.viewModel?.checkIn(item: item, vc: self, completion: { saved in
             switch saved {
             case true:
@@ -321,56 +331,7 @@ extension ViewController {
     }
 }
 
-/*
-extension ViewController: Actionable {
-    enum Action {
-        case deleteList(list: String)
-        case close
-        case keepItem
-        case deleteItem(item: String)
-    }
-}
-
-
-protocol Coordinator {
-    
-    //    /// A child coordinator spun off by this coordinator.
-    //    /// Important to keep a reference to prevent deallocation.
-    //    var childCoordinator: Coordinator? { get set }
-    
-    /// Start any action this coordinator should take. Often, this is
-    /// presenting/pushing a new controller, or starting up a
-    /// child coordinator.
-    ///
-    /// - Parameters:
-    ///   - animated: whether to animate any transitions.
-    ///   - completion: a completion block.
-    func completeAction(animated: Bool, completion: VoidClosure?)
-    
-    /// Clean up after this coordinator. Should get the app back to the
-    /// state it was in when this coordinator started.
-    ///
-    /// - Parameters:
-    ///   - animated: whether to animate any transitions.
-    ///   - completion: a completion block.
-    func cleanup(animated: Bool, completion: VoidClosure?)
-    
-}
 
 
 public typealias VoidClosure = () -> Void
 
-//open class BaseView: UIView {
-//    public override init(frame: CGRect = .zero) {
-//        super.init(frame: frame)
-//        setup()
-//    }
-//
-//    public required init?(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//        setup()
-//    }
-//
-//    open func setup() {}
-//}
-*/
