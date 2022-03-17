@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		50F15A0A1858EB226DB713A5 /* Pods_TestProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64DCDB2155306F041532BC15 /* Pods_TestProject.framework */; };
+		E85E6DBF27E37D8800E0FDCC /* LoMATWorkflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E85E6DBE27E37D8800E0FDCC /* LoMATWorkflow.swift */; };
+		E85E6DC127E37D8D00E0FDCC /* workflow.json in Resources */ = {isa = PBXBuildFile; fileRef = E85E6DC027E37D8D00E0FDCC /* workflow.json */; };
 		E86997E027E1D6ED004B5653 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86997DF27E1D6ED004B5653 /* NetworkManager.swift */; };
 		E86997E327E1DBE8004B5653 /* ExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86997E227E1DBE8004B5653 /* ExtensionViewController.swift */; };
 		E87B5FC727E171330068A3DE /* ActionClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87B5FC627E171330068A3DE /* ActionClass.swift */; };
@@ -28,6 +30,8 @@
 		64DCDB2155306F041532BC15 /* Pods_TestProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		78B70F0C94E3D288D2A37937 /* Pods-TestProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestProject.release.xcconfig"; path = "Target Support Files/Pods-TestProject/Pods-TestProject.release.xcconfig"; sourceTree = "<group>"; };
 		AAD4C6DC31D8B70A37A9A568 /* Pods-TestProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestProject.debug.xcconfig"; path = "Target Support Files/Pods-TestProject/Pods-TestProject.debug.xcconfig"; sourceTree = "<group>"; };
+		E85E6DBE27E37D8800E0FDCC /* LoMATWorkflow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoMATWorkflow.swift; sourceTree = "<group>"; };
+		E85E6DC027E37D8D00E0FDCC /* workflow.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = workflow.json; sourceTree = "<group>"; };
 		E86997DF27E1D6ED004B5653 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		E86997E227E1DBE8004B5653 /* ExtensionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionViewController.swift; sourceTree = "<group>"; };
 		E87B5FC627E171330068A3DE /* ActionClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionClass.swift; sourceTree = "<group>"; };
@@ -73,6 +77,15 @@
 				64DCDB2155306F041532BC15 /* Pods_TestProject.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E85E6DBD27E37CF500E0FDCC /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E85E6DBE27E37D8800E0FDCC /* LoMATWorkflow.swift */,
+				E85E6DC027E37D8D00E0FDCC /* workflow.json */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		E86997E127E1DBD5004B5653 /* Utilities */ = {
@@ -137,6 +150,7 @@
 		E8D1E5B327E1369900C009D1 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				E85E6DBD27E37CF500E0FDCC /* Model */,
 				E87B5FC527E1711E0068A3DE /* Coordinators */,
 				E8D1E5BA27E1375A00C009D1 /* ViewComponents */,
 				E8D1E5B927E1375300C009D1 /* Buttons */,
@@ -231,6 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E85E6DC127E37D8D00E0FDCC /* workflow.json in Resources */,
 				E8D1E5AC27E135F200C009D1 /* LaunchScreen.storyboard in Resources */,
 				E8D1E5A927E135F200C009D1 /* Assets.xcassets in Resources */,
 				E8D1E5A727E135F000C009D1 /* Main.storyboard in Resources */,
@@ -292,6 +307,7 @@
 				E8D1E5A027E135F000C009D1 /* AppDelegate.swift in Sources */,
 				E86997E327E1DBE8004B5653 /* ExtensionViewController.swift in Sources */,
 				E8D1E5BC27E1376F00C009D1 /* CustomButton.swift in Sources */,
+				E85E6DBF27E37D8800E0FDCC /* LoMATWorkflow.swift in Sources */,
 				E8D1E5BE27E137C800C009D1 /* Checking.swift in Sources */,
 				E8D1E5A227E135F000C009D1 /* SceneDelegate.swift in Sources */,
 				E8D1E5B527E136BA00C009D1 /* CustomTitleLabel.swift in Sources */,

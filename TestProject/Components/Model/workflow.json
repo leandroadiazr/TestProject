@@ -1,0 +1,274 @@
+{
+  "id": "3e32a61b-0251-49c3-832a-926ace6a8e28",
+  "applicableTrailerTypeIds": [
+    2,
+    3,
+    12,
+    24,
+    25,
+    42
+  ],
+  "poNumber": 19687889,
+  "stopId": 21446348,
+  "stopType": "first_pickup",
+  "workflowType": "VAN_SHIPPER",
+  "stopMilestone": [
+    {
+      "id": 1,
+      "stopMilestoneType": "CHECK_IN",
+      "completed": false,
+      "eventPublished": false,
+      "driverLocation": {
+        "city": null,
+        "state": null,
+        "postalCode": null
+      },
+      "questions": [
+        {
+          "id": 1,
+          "descendants": [
+            {
+              "descendantId": 2,
+              "condition": "answered"
+            }
+          ],
+          "questionName": "CheckedInDateTime",
+          "questionType": "datetime",
+          "style": "toggle",
+          "header": "Check In",
+          "questionText": null,
+          "displayData": null,
+          "selectedAnswer": null,
+          "uiState": "ACTIVE",
+          "mobileDisplayData": null,
+          "availableResponses": []
+        },
+        {
+          "id": 2,
+          "descendants": null,
+          "questionName": "CheckedInSubmit",
+          "questionType": "submit",
+          "style": null,
+          "header": "Submit Location",
+          "questionText": null,
+          "displayData": null,
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": null,
+          "availableResponses": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "stopMilestoneType": "LOADED",
+      "completed": false,
+      "eventPublished": false,
+      "driverLocation": {
+        "city": null,
+        "state": null,
+        "postalCode": null
+      },
+      "questions": [
+        {
+          "id": 1,
+          "descendants": [
+            {
+              "descendantId": 2,
+              "condition": "answered"
+            }
+          ],
+          "questionName": "LoadedTime",
+          "questionType": "datetime",
+          "style": "toggle",
+          "header": "Loaded",
+          "questionText": null,
+          "displayData": null,
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": null,
+          "availableResponses": []
+        },
+        {
+          "id": 2,
+          "descendants": [
+            {
+              "descendantId": 6,
+              "condition": "false"
+            },
+            {
+              "descendantId": 3,
+              "condition": "true"
+            }
+          ],
+          "questionName": "issues",
+          "questionType": "boolean",
+          "style": "radio",
+          "header": "Were there any issues?",
+          "questionText": "",
+          "displayData": null,
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": null,
+          "availableResponses": [
+            {
+              "display": "Problems",
+              "value": "false"
+            },
+            {
+              "display": "No Issues",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "descendants": [
+            {
+              "descendantId": 6,
+              "condition": "false"
+            },
+            {
+              "descendantId": 4,
+              "condition": "true"
+            }
+          ],
+          "questionName": "CommodityConfirm",
+          "questionType": "boolean",
+          "style": "radio",
+          "header": "Confirm Commodity",
+          "questionText": "",
+          "displayData": [
+            {
+              "RowID": 0,
+              "Quantity": "1",
+              "UnitDescription": "Truckload",
+              "CommodityDescription": "Frozen potatoes",
+              "CommodityDescriptionNA": null,
+              "Notes": ""
+            }
+          ],
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": "[\r\n  {\r\n    \"rowID\": 0,\r\n    \"quantity\": \"1\",\r\n    \"unitDescription\": \"Truckload\",\r\n    \"commodityDescription\": \"Frozen potatoes\",\r\n    \"commodityDescriptionNA\": null,\r\n    \"notes\": \"\"\r\n  }\r\n]",
+          "availableResponses": [
+            {
+              "display": "No",
+              "value": "false"
+            },
+            {
+              "display": "Yes",
+              "value": "true"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "descendants": [
+            {
+              "descendantId": 5,
+              "condition": "true"
+            }
+          ],
+          "questionName": "ConfirmNextStop",
+          "questionType": "boolean",
+          "style": "nextStop",
+          "header": "Confirm Next Stop",
+          "questionText": "",
+          "displayData": {
+            "RowId": 24250786,
+            "StopType": "Drop",
+            "Name": "OFFICE FURNITURE USA (LAS VEGAS,NV)",
+            "Address": "40 N Mojave Rd ",
+            "City": "Las Vegas",
+            "State": "NV",
+            "Zip": "89101",
+            "SortOrder": 1,
+            "Directions": "40 North Mojave Rd\r\nLas Vegas NV 89101     ",
+            "Latitude": 36.17496,
+            "Longitude": -115.12339,
+            "Phone": "            ",
+            "SStopDate": "02/12/2022",
+            "StopDate": "2022-02-12T00:00:00",
+            "StopTime": "Appt 01",
+            "Quantity": 0,
+            "UnitDescription": "",
+            "CommodityDescription": "",
+            "LoadStopCommodities": null,
+            "Notes": "",
+            "RefNumber": "",
+            "Status": "In Transit",
+            "Complete": false,
+            "PONumber": 19687889,
+            "Commodities": "",
+            "CarrierID": 0
+          },
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": "{\r\n  \"rowId\": 24250786,\r\n  \"stopType\": \"Drop\",\r\n  \"name\": \"OFFICE FURNITURE USA (LAS VEGAS,NV)\",\r\n  \"address\": \"40 N Mojave Rd \",\r\n  \"city\": \"Las Vegas\",\r\n  \"state\": \"NV\",\r\n  \"zip\": \"89101\",\r\n  \"sortOrder\": 1,\r\n  \"directions\": \"40 North Mojave Rd\\r\\nLas Vegas NV 89101     \",\r\n  \"latitude\": 36.17496,\r\n  \"longitude\": -115.12339,\r\n  \"phone\": \"            \",\r\n  \"sStopDate\": \"02/12/2022\",\r\n  \"stopDate\": \"2022-02-12T00:00:00\",\r\n  \"stopTime\": \"Appt 01\",\r\n  \"quantity\": 0,\r\n  \"unitDescription\": \"\",\r\n  \"commodityDescription\": \"\",\r\n  \"loadStopCommodities\": null,\r\n  \"notes\": \"\",\r\n  \"refNumber\": \"\",\r\n  \"status\": \"In Transit\",\r\n  \"complete\": false,\r\n  \"poNumber\": 19687889,\r\n  \"commodities\": \"\",\r\n  \"carrierID\": 0\r\n}",
+          "availableResponses": []
+        },
+        {
+          "id": 5,
+          "descendants": [
+            {
+              "descendantId": 6,
+              "condition": "true"
+            }
+          ],
+          "questionName": "NextStopETA",
+          "questionType": "datetime",
+          "style": "button",
+          "header": "ETA to Next Stop",
+          "questionText": "Update",
+          "displayData": null,
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": null,
+          "availableResponses": []
+        },
+        {
+          "id": 6,
+          "descendants": null,
+          "questionName": "LoadedSubmit",
+          "questionType": "submit",
+          "style": null,
+          "header": "Submit Location",
+          "questionText": null,
+          "displayData": null,
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": null,
+          "availableResponses": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "stopMilestoneType": "UPLOAD",
+      "completed": false,
+      "eventPublished": false,
+      "driverLocation": {
+        "city": null,
+        "state": null,
+        "postalCode": null
+      },
+      "questions": [
+        {
+          "id": 1,
+          "descendants": null,
+          "questionName": "BOL",
+          "questionType": "uploadDocument",
+          "style": null,
+          "header": "Upload BOL's (optional)",
+          "questionText": "Attach Files",
+          "displayData": "1",
+          "selectedAnswer": null,
+          "uiState": "DISABLED",
+          "mobileDisplayData": "1",
+          "availableResponses": []
+        }
+      ]
+    }
+  ]
+}

@@ -25,20 +25,21 @@ enum NetworkManager {
         static let milestone = "milestone"
     }
     
-    static func updateWith(WorkFlowItem: WorkFlow, actionType: NetworkHandler, completed: @escaping (ErrorMessage?) -> Void){
+    static func updateWith(milestone: LoMAT.StopMilestone, actionType: NetworkHandler, completed: @escaping (ErrorMessage?) -> Void){
         retreiveItems { result in
             
             switch result {
             case .success(let items):
+                
                 var retreivedItems = items
                 
                 switch actionType {
                 case .add:
-                    guard !retreivedItems.contains(where: {$0 == WorkFlowItem} ) else {
+                    guard !retreivedItems.contains(where: {$0.id == milestone.id} ) else {
                         completed(.alreadyCheckedIn)
                         return
                     }
-                    retreivedItems.append(WorkFlowItem)
+                    retreivedItems.append(milestone)
                 case .remove:
                     guard !retreivedItems.isEmpty else {
                         completed(.isEmpty)
@@ -55,21 +56,21 @@ enum NetworkManager {
         }
     }
     
-    static func retreiveItems(completed: @escaping (Result<[WorkFlow], ErrorMessage>) -> Void) {
+    static func retreiveItems(completed: @escaping (Result<[LoMAT.StopMilestone], ErrorMessage>) -> Void) {
         guard let itemsData = defaults.object(forKey: Keys.milestone) as? Data else {
             completed(.success([]))
             return
         }
         do{
             let decoder = JSONDecoder()
-            let items = try decoder.decode([WorkFlow].self, from: itemsData)
+            let items = try decoder.decode([LoMAT.StopMilestone].self, from: itemsData)
             completed(.success(items))
         } catch {
             completed(.failure(.unableToDecode))
         }
     }
     
-    static func completeChecking(milestones:  [WorkFlow]) -> ErrorMessage? {
+    static func completeChecking(milestones:  [LoMAT.StopMilestone]) -> ErrorMessage? {
         do{
             let encoder = JSONEncoder()
             let encodedItems = try encoder.encode(milestones)

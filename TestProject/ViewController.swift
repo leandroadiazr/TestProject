@@ -28,18 +28,19 @@ struct WorkFlow: Codable, Hashable {
 
 //MARK: CONTENTVIEWMODEL
 class ContentViewModel {
-    var checkInMilestone = [WorkFlow]()
+    var checkInMilestone = [LoMAT.StopMilestone]()
+    var milestone: LoMAT.StopMilestone?
     
-    init(milestone: WorkFlow?) {
+    init(milestone: LoMAT.StopMilestone?) {
         if let milestone = milestone {
             self.checkInMilestone.append(milestone)
         }
     }
     
-    func checkIn(item: WorkFlow, vc: UIViewController, completion: @escaping (Bool) -> Void) {
+    func checkIn(item: LoMAT.StopMilestone, vc: UIViewController, completion: @escaping (Bool) -> Void) {
         vc.showLoadingView()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-        NetworkManager.updateWith(WorkFlowItem: item, actionType: .add) { error in
+        NetworkManager.updateWith(milestone: item, actionType: .add) { error in
             vc.dismissLoadingView()
             guard let error = error else {
                 vc.customAlert(title: "Success!...", message: "Milestone Completed...", buttonTitle: "Okay")
@@ -52,10 +53,10 @@ class ContentViewModel {
         }
     }
     
-    func deleteAll(item: WorkFlow, vc: UIViewController, completion: @escaping (Bool) -> Void) {
+    func deleteAll(item: LoMAT.StopMilestone, vc: UIViewController, completion: @escaping (Bool) -> Void) {
         vc.showLoadingView()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            NetworkManager.updateWith(WorkFlowItem: item, actionType: .remove) { error in
+            NetworkManager.updateWith(milestone: item, actionType: .remove) { error in
                 vc.dismissLoadingView()
                 guard let error = error else {
                     vc.customAlert(title: "Success!...", message: "Milestone Deleted...", buttonTitle: "Okay")
@@ -75,9 +76,11 @@ class ViewController: UIViewController {
     var viewModel: ContentViewModel? {
         didSet {
             guard let milestones = viewModel?.checkInMilestone else { return }
-
+            
             for milestone in milestones {
-                if milestone.milestoneCompleted == true {
+                if milestone.completed == true {
+//                if milestone.milestoneCompleted == true {
+                    for question in milestone.questions {
                     self.checkingLabel.text = "Already checked in"
                     checkInToggle.isOn = true
                     checkInToggle.isEnabled = false
@@ -85,9 +88,13 @@ class ViewController: UIViewController {
                     submitButton.isEnabled = false
                     submitButton.backgroundColor = .clear
                     submitButton.setTitleColor(.systemBlue, for: .disabled)
-                    if let date = milestone.checkinDate {
-                        datePicker.date = date
+                        if let date = question.selectedAnswer {
+                            
+//                    if let date = milestone.checkinDate {
+                            datePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
                         datePicker.isEnabled = false
+//                    }
+                        }
                     }
                 }
             }
@@ -206,7 +213,7 @@ class ViewController: UIViewController {
         self.deleteButton.isHidden = hidden
         guard let milestones = self.viewModel?.checkInMilestone else { return }
         milestones.forEach({
-            if $0.milestoneCompleted ?? false {
+            if $0.completed {
                 dateLabel.isHidden = !hidden
                 datePicker.isHidden = !hidden
                 deleteButton.isHidden = !hidden
@@ -218,8 +225,16 @@ class ViewController: UIViewController {
     }
 
     private func initContentViewModel() {
-        let testItem = [WorkFlow(milesstoneId: 2, checkinDate: Date(), milestoneCompleted: false), WorkFlow(milesstoneId: 3, checkinDate: Date(), milestoneCompleted: false),  ]
-        testItem.forEach({ self.viewModel = ContentViewModel(milestone: $0) })
+        let testNewItem = LoMAT.Workflow.init(fromJsonFile: "workflow")
+//        print("this is the new json", testNewItem)
+        testNewItem?.stopMilestone.forEach({
+
+            self.viewModel = ContentViewModel(milestone: $0)
+            print(self.viewModel?.checkInMilestone)
+    
+        })
+//        let testItem = [WorkFlow(milesstoneId: 2, checkinDate: Date(), milestoneCompleted: false), WorkFlow(milesstoneId: 3, checkinDate: Date(), milestoneCompleted: false),  ]
+//        testItem.forEach({ self.viewModel = ContentViewModel(milestone: $0) })
     }
     
     private func loadData() {
@@ -307,27 +322,47 @@ extension ViewController {
     }
     
     @objc private func checkInButtonTapped(_ sender: UIButton) {
-        guard toggleChanged && checkinDate != nil else {
-            self.customAlert(title: "Choose Date ", message: "Trya again", buttonTitle: "ok")
-            return
-        }
-        let item = WorkFlow(milesstoneId: 1, checkinDate: self.checkinDate, milestoneCompleted: self.toggleChanged)
-        print("printing this item ", item)
-        self.viewModel?.checkIn(item: item, vc: self, completion: { saved in
-            switch saved {
-            case true:
-                self.deleteButton.isHidden = false
-                self.checkInToggle.isEnabled = false
-                self.datePicker.isEnabled = false
-                self.submitButton.setTitle("Submitted", for: .normal)
-                self.submitButton.setTitleColor(.systemBlue, for: .disabled)
-                self.submitButton.backgroundColor = .clear
-                self.submitButton.isEnabled = false
-            case false:
-                break
-            }
+//        guard toggleChanged && checkinDate != nil else {
+//            self.customAlert(title: "Choose Date ", message: "Trya again", buttonTitle: "ok")
+//            return
+//        }
+        
+        
+        guard let workflow =  self.viewModel?.checkInMilestone else { return }
+        workflow.forEach({
+            
+            
+            print($0)
+            
+            
             
         })
+        for milestone in workflow {
+            print(milestone)
+//            if milestone.stopMilestoneType == "CHECK_IN" {
+//                var currentMilestone = milestone
+//                print(currentMilestone)
+//            }
+        }
+        
+//        let newItem = LoMAT.StopMilestone(id: self.viewModel?.checkInMilestone, stopMilestoneType: <#T##String#>, completed: <#T##Bool#>, eventPublished: <#T##Bool#>, questions: <#T##[LoMAT.Question]#>, driverLocation: <#T##LoMAT.DriverLocation?#>)
+        let item = WorkFlow(milesstoneId: 1, checkinDate: self.checkinDate, milestoneCompleted: self.toggleChanged)
+        print("printing this item ", item)
+//        self.viewModel?.checkIn(item: item, vc: self, completion: { saved in
+//            switch saved {
+//            case true:
+//                self.deleteButton.isHidden = false
+//                self.checkInToggle.isEnabled = false
+//                self.datePicker.isEnabled = false
+//                self.submitButton.setTitle("Submitted", for: .normal)
+//                self.submitButton.setTitleColor(.systemBlue, for: .disabled)
+//                self.submitButton.backgroundColor = .clear
+//                self.submitButton.isEnabled = false
+//            case false:
+//                break
+//            }
+//            
+//        })
     }
 }
 

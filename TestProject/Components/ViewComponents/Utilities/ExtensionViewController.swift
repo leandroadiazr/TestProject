@@ -46,5 +46,19 @@ extension UIViewController {
             containerView = nil
         }
     }
+    
+    //MM-dd-yyyy HH:mm
+    //"MM/dd/yyyy"
+    func convertToDate(string: String, format: String) -> Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.date(from: string) ?? Date()
+    }
+    
+    func convertDateToString(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        return dateFormatter.string(from: date)
+    }
 
 }
