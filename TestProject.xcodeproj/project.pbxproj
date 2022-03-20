@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		50F15A0A1858EB226DB713A5 /* Pods_TestProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64DCDB2155306F041532BC15 /* Pods_TestProject.framework */; };
 		E86997E027E1D6ED004B5653 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86997DF27E1D6ED004B5653 /* NetworkManager.swift */; };
-		E86997E327E1DBE8004B5653 /* ExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86997E227E1DBE8004B5653 /* ExtensionViewController.swift */; };
 		E87B5FC727E171330068A3DE /* ActionClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87B5FC627E171330068A3DE /* ActionClass.swift */; };
 		E87B5FCA27E1725A0068A3DE /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87B5FC927E1725A0068A3DE /* Coordinator.swift */; };
+		E87B5FD227E7C7F20068A3DE /* LoMat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87B5FD127E7C7F20068A3DE /* LoMat.swift */; };
+		E87B5FD427E7C8110068A3DE /* workflow.json in Resources */ = {isa = PBXBuildFile; fileRef = E87B5FD327E7C8110068A3DE /* workflow.json */; };
+		E87B5FD727E7C8490068A3DE /* ExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87B5FD627E7C8490068A3DE /* ExtensionViewController.swift */; };
 		E8D1E5A027E135F000C009D1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E59F27E135F000C009D1 /* AppDelegate.swift */; };
 		E8D1E5A227E135F000C009D1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5A127E135F000C009D1 /* SceneDelegate.swift */; };
 		E8D1E5A427E135F000C009D1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5A327E135F000C009D1 /* ViewController.swift */; };
@@ -29,9 +31,11 @@
 		78B70F0C94E3D288D2A37937 /* Pods-TestProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestProject.release.xcconfig"; path = "Target Support Files/Pods-TestProject/Pods-TestProject.release.xcconfig"; sourceTree = "<group>"; };
 		AAD4C6DC31D8B70A37A9A568 /* Pods-TestProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestProject.debug.xcconfig"; path = "Target Support Files/Pods-TestProject/Pods-TestProject.debug.xcconfig"; sourceTree = "<group>"; };
 		E86997DF27E1D6ED004B5653 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		E86997E227E1DBE8004B5653 /* ExtensionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionViewController.swift; sourceTree = "<group>"; };
 		E87B5FC627E171330068A3DE /* ActionClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionClass.swift; sourceTree = "<group>"; };
 		E87B5FC927E1725A0068A3DE /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
+		E87B5FD127E7C7F20068A3DE /* LoMat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoMat.swift; sourceTree = "<group>"; };
+		E87B5FD327E7C8110068A3DE /* workflow.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = workflow.json; sourceTree = "<group>"; };
+		E87B5FD627E7C8490068A3DE /* ExtensionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtensionViewController.swift; sourceTree = "<group>"; };
 		E8D1E59C27E135F000C009D1 /* TestProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D1E59F27E135F000C009D1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E8D1E5A127E135F000C009D1 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -75,14 +79,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E86997E127E1DBD5004B5653 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				E86997E227E1DBE8004B5653 /* ExtensionViewController.swift */,
-			);
-			path = Utilities;
-			sourceTree = "<group>";
-		};
 		E87B5FC527E1711E0068A3DE /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
@@ -98,6 +94,48 @@
 			children = (
 			);
 			path = "New Group";
+			sourceTree = "<group>";
+		};
+		E87B5FCD27E7C7B80068A3DE /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				E86997DF27E1D6ED004B5653 /* NetworkManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		E87B5FCE27E7C7C00068A3DE /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				E8D1E5A327E135F000C009D1 /* ViewController.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		E87B5FCF27E7C7C70068A3DE /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				E8D1E59F27E135F000C009D1 /* AppDelegate.swift */,
+				E8D1E5A127E135F000C009D1 /* SceneDelegate.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		E87B5FD027E7C7E50068A3DE /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E87B5FD127E7C7F20068A3DE /* LoMat.swift */,
+				E87B5FD327E7C8110068A3DE /* workflow.json */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		E87B5FD527E7C8490068A3DE /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				E87B5FD627E7C8490068A3DE /* ExtensionViewController.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		E8D1E59327E135F000C009D1 = {
@@ -121,11 +159,12 @@
 		E8D1E59E27E135F000C009D1 /* TestProject */ = {
 			isa = PBXGroup;
 			children = (
+				E87B5FD527E7C8490068A3DE /* Utilities */,
+				E87B5FD027E7C7E50068A3DE /* Model */,
 				E8D1E5B327E1369900C009D1 /* Components */,
-				E8D1E59F27E135F000C009D1 /* AppDelegate.swift */,
-				E8D1E5A127E135F000C009D1 /* SceneDelegate.swift */,
-				E8D1E5A327E135F000C009D1 /* ViewController.swift */,
-				E86997DF27E1D6ED004B5653 /* NetworkManager.swift */,
+				E87B5FCF27E7C7C70068A3DE /* Support */,
+				E87B5FCE27E7C7C00068A3DE /* Screens */,
+				E87B5FCD27E7C7B80068A3DE /* Managers */,
 				E8D1E5A527E135F000C009D1 /* Main.storyboard */,
 				E8D1E5A827E135F200C009D1 /* Assets.xcassets */,
 				E8D1E5AA27E135F200C009D1 /* LaunchScreen.storyboard */,
@@ -165,7 +204,6 @@
 		E8D1E5BA27E1375A00C009D1 /* ViewComponents */ = {
 			isa = PBXGroup;
 			children = (
-				E86997E127E1DBD5004B5653 /* Utilities */,
 				E8D1E5BD27E137C800C009D1 /* Checking.swift */,
 			);
 			path = ViewComponents;
@@ -231,6 +269,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E87B5FD427E7C8110068A3DE /* workflow.json in Resources */,
 				E8D1E5AC27E135F200C009D1 /* LaunchScreen.storyboard in Resources */,
 				E8D1E5A927E135F200C009D1 /* Assets.xcassets in Resources */,
 				E8D1E5A727E135F000C009D1 /* Main.storyboard in Resources */,
@@ -290,13 +329,14 @@
 				E8D1E5A427E135F000C009D1 /* ViewController.swift in Sources */,
 				E86997E027E1D6ED004B5653 /* NetworkManager.swift in Sources */,
 				E8D1E5A027E135F000C009D1 /* AppDelegate.swift in Sources */,
-				E86997E327E1DBE8004B5653 /* ExtensionViewController.swift in Sources */,
 				E8D1E5BC27E1376F00C009D1 /* CustomButton.swift in Sources */,
 				E8D1E5BE27E137C800C009D1 /* Checking.swift in Sources */,
 				E8D1E5A227E135F000C009D1 /* SceneDelegate.swift in Sources */,
 				E8D1E5B527E136BA00C009D1 /* CustomTitleLabel.swift in Sources */,
 				E8D1E5B727E1371000C009D1 /* CustomSubtitleLabel.swift in Sources */,
 				E87B5FCA27E1725A0068A3DE /* Coordinator.swift in Sources */,
+				E87B5FD727E7C8490068A3DE /* ExtensionViewController.swift in Sources */,
+				E87B5FD227E7C7F20068A3DE /* LoMat.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
