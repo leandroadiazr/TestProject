@@ -110,6 +110,29 @@ class ViewController: UIViewController {
         }
     }
     
+    private var isCheckingMilestone: LoMAT.StopMilestone? {
+        didSet {
+            isCheckingMilestone = self.viewModel?.currentMilestone
+            if isCheckingMilestone != nil && isCheckingMilestone?.completed == true {
+                self.checkingLabel.text = "Already checked in"
+                checkInToggle.isOn = true
+                checkInToggle.isEnabled = false
+                submitButton.setTitle("Submited", for: .normal)
+                submitButton.isEnabled = false
+                submitButton.backgroundColor = .clear
+                submitButton.setTitleColor(.systemBlue, for: .disabled)
+                guard let dateQuestion = isCheckingMilestone?.questions.first(where: { $0.questionName == "CheckedInDateTime" }) else { return }
+                
+                if let date = dateQuestion.selectedAnswer {
+                    datePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
+                    datePicker.isEnabled = false
+                }
+                
+                self.currentMilestone = isCheckingMilestone
+            }
+        }
+    }
+    
     var currentMilestone: LoMAT.StopMilestone?
     
     lazy var stopLabel: UILabel = {
