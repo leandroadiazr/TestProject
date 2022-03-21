@@ -14,38 +14,23 @@ enum MilestoneType: String, CaseIterable {
     case upload = "UPLOAD"
 }
 
-
-//MARK: MODEL
-struct WorkFlow: Codable, Hashable {
-    
-    //CHECKIN MILESTONE
-    var milesstoneId: Int?
-    var checkinDate: Date?
-    var milestoneCompleted: Bool?
-    
-    //LOADED MILESTONE
-    //    var loadedId: Int?
-    //    var answer: String
-    
-    //
-    
-    
-}
-
 //MARK: CONTENTVIEWMODEL
 class ContentViewModel {
-    var checkInMilestone: [LoMAT.StopMilestone]?
+    var allMilestones: [LoMAT.StopMilestone]?
+    var currentMilestone: LoMAT.StopMilestone?
     var questions: [LoMAT.Question]?
     
     init(milestones: [LoMAT.StopMilestone]?) {
         if let milestones = milestones {
-            self.checkInMilestone = milestones
+            self.allMilestones = milestones
             for milestone in milestones {
                 self.questions?.append(contentsOf: milestone.questions)
             }
         }
     }
     
+    
+    //MARK: Check In
     func checkIn(item: LoMAT.StopMilestone, vc: UIViewController, completion: @escaping (Bool) -> Void) {
         
         vc.showLoadingView()
@@ -63,11 +48,12 @@ class ContentViewModel {
         }
     }
     
+    //MARK: Delete All
     func deleteAll(item: LoMAT.StopMilestone, vc: UIViewController, completion: @escaping (Bool) -> Void) {
-        vc.showLoadingView()
+        //        vc.showLoadingView()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             NetworkManager.updateWith(milestone: item, actionType: .remove) { error in
-                vc.dismissLoadingView()
+                //                vc.dismissLoadingView()
                 guard let error = error else {
                     vc.customAlert(title: "Success!...", message: "Milestone Deleted...", buttonTitle: "Okay")
                     completion(true)
@@ -85,55 +71,40 @@ class ViewController: UIViewController {
     
     var viewModel: ContentViewModel? {
         didSet {
-            guard let milestones = viewModel?.checkInMilestone else { return }
+            guard let milestones = viewModel?.allMilestones else { return }
             
+            guard let checkInMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.checkIn.rawValue }) else { return }
             
-            guard let checkInMilestone = viewModel?.checkInMilestone?.first(where: { $0.stopMilestoneType == MilestoneType.checkIn.rawValue }) else { return }
-            
-            if checkInMilestone.completed == true {
-                self.checkingLabel.text = "Already checked in"
-                checkInToggle.isOn = true
-                checkInToggle.isEnabled = false
-                submitButton.setTitle("Submited", for: .normal)
-                submitButton.isEnabled = false
-                submitButton.backgroundColor = .clear
-                submitButton.setTitleColor(.systemBlue, for: .disabled)
-                guard let dateQuestion = checkInMilestone.questions.first(where: { $0.questionName == "CheckedInDateTime" }) else { return }
-                
-                if let date = dateQuestion.selectedAnswer {
-                    datePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
-                    datePicker.isEnabled = false
-                }
+            if checkInMilestone.completed {
+                self.isCheckinCompleted(milestone: checkInMilestone)
+                self.changeVisibility(hidden: false)
             } else {
-                self.currentMilestone = milestones.first(where: {$0.completed == false })
+                viewModel?.currentMilestone = checkInMilestone
+                self.changeVisibility(hidden: true)
+                
             }
+            
+            guard let loadedMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.loaded.rawValue }) else { return }
+            guard let uploadMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.upload.rawValue }) else { return }
         }
     }
     
-    private var isCheckingMilestone: LoMAT.StopMilestone? {
-        didSet {
-            isCheckingMilestone = self.viewModel?.currentMilestone
-            if isCheckingMilestone != nil && isCheckingMilestone?.completed == true {
-                self.checkingLabel.text = "Already checked in"
-                checkInToggle.isOn = true
-                checkInToggle.isEnabled = false
-                submitButton.setTitle("Submited", for: .normal)
-                submitButton.isEnabled = false
-                submitButton.backgroundColor = .clear
-                submitButton.setTitleColor(.systemBlue, for: .disabled)
-                guard let dateQuestion = isCheckingMilestone?.questions.first(where: { $0.questionName == "CheckedInDateTime" }) else { return }
-                
-                if let date = dateQuestion.selectedAnswer {
-                    datePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
-                    datePicker.isEnabled = false
-                }
-                
-                self.currentMilestone = isCheckingMilestone
-            }
+    private func isCheckinCompleted(milestone: LoMAT.StopMilestone) {
+        self.checkingLabel.text = "Already checked in"
+        checkInToggle.isOn = true
+        checkInToggle.isEnabled = false
+        submitButton.setTitle("Submited", for: .normal)
+        submitButton.isEnabled = false
+        submitButton.setTitleColor(.systemBlue, for: .disabled)
+        guard let milestones = self.viewModel?.allMilestones?.first(where: { $0.stopMilestoneType == MilestoneType.checkIn.rawValue }) else { return }
+        guard let dateQuestion = milestones.questions.first(where: { $0.questionName == "CheckedInDateTime" }) else { return }
+        if let date = dateQuestion.selectedAnswer {
+            datePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
+            datePicker.isEnabled = false
         }
+        self.changeVisibility(hidden: false)
+        submitButton.backgroundColor = .clear
     }
-    
-    var currentMilestone: LoMAT.StopMilestone?
     
     lazy var stopLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 16, text: "Pick 1 - Walmart Supercenter")
@@ -162,12 +133,12 @@ class ViewController: UIViewController {
     private var toggleChanged: Bool = false {
         didSet {
             checkInToggle.isOn = toggleChanged
-            //            changeVisibility(hidden: !toggleChanged)
+            changeVisibility(hidden: !toggleChanged)
+            submitButton.backgroundColor = !toggleChanged ? .lightGray : .systemBlue
         }
     }
     
     //MARK: - Date Picker
-    
     lazy var dateLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 14, text: "Time")
         return label
@@ -240,22 +211,23 @@ class ViewController: UIViewController {
         configure()
         initContentViewModel()
         loadData()
-        //        changeVisibility()
+        submitButton.backgroundColor = !toggleChanged ? .lightGray : .systemBlue
+        //        flushSystem()
+    }
+    
+    private func flushSystem() {
+        for milestone in self.viewModel!.allMilestones! {
+            self.viewModel?.deleteAll(item: milestone, vc: self, completion: { response in
+                print(response)
+            })
+        }
     }
     
     private func changeVisibility(hidden: Bool = true) {
         self.deleteButton.isHidden = hidden
-        guard let milestones = self.viewModel?.checkInMilestone else { return }
-        milestones.forEach({
-            if $0.completed {
-                dateLabel.isHidden = !hidden
-                datePicker.isHidden = !hidden
-                deleteButton.isHidden = !hidden
-            } else {
-                dateLabel.isHidden = hidden
-                datePicker.isHidden = hidden
-            }
-        })
+        dateLabel.isHidden = hidden
+        datePicker.isHidden = hidden
+        datePickerView.isHidden = hidden
     }
     
     private func initContentViewModel() {
@@ -264,14 +236,18 @@ class ViewController: UIViewController {
     }
     
     private func loadData() {
+        self.showLoadingView()
         NetworkManager.retreiveItems { [weak self] result in
-            print(result)
+            //            print(result)
             guard let self = self else { return }
             switch result {
             case .success(let milestones):
-                // print(milestones)
+                self.dismissLoadingView()
+                guard !milestones.isEmpty else {
+                    self.deleteButton.isHidden = true
+                    return
+                }
                 self.viewModel = ContentViewModel(milestones: milestones)
-                //                    items.forEach({ self.viewModel = ContentViewModel(milestone: $0)})
             case .failure(let error):
                 print(error.rawValue)
             }
@@ -327,26 +303,35 @@ class ViewController: UIViewController {
 extension ViewController {
     @objc private func deleteAll() {
         
-        guard let milestones = self.viewModel?.checkInMilestone else { return }
+        guard let milestones = self.viewModel?.allMilestones else { return }
         for milestone in milestones {
             self.deleteButton.isHidden = false
-            self.viewModel?.deleteAll(item: milestone, vc: self, completion: { deleted in
+            
+            self.viewModel?.deleteAll(item: milestone, vc: self, completion: { [weak self] deleted in
                 
                 switch deleted {
                 case true:
-                    self.customAlert(title: "Deleted", message: "Deleted", buttonTitle: "ok")
-                    self.checkInToggle.isEnabled = true
-                    self.datePicker.isEnabled = true
-                    self.datePicker.date = Date()
-                    self.submitButton.setTitle("Submit", for: .normal)
-                    self.submitButton.backgroundColor = .systemBlue
-                    self.submitButton.isEnabled = true
+                    self?.customAlert(title: "Deleted", message: "Deleted", buttonTitle: "ok")
+                    self?.resetCheckinUI()
                 case false:
-                    self.deleteButton.isHidden = true
+                    self?.deleteButton.isHidden = true
                 }
                 
             })
         }
+    }
+    
+    private func resetCheckinUI() {
+        self.checkingLabel.text = "Check In"
+        self.checkInToggle.isEnabled = true
+        self.checkInToggle.isOn = false
+        self.datePicker.isEnabled = true
+        self.datePicker.date = Date()
+        datePickerView.isHidden = true
+        self.submitButton.setTitle("Submit", for: .normal)
+        self.submitButton.backgroundColor = .systemBlue
+        self.submitButton.isEnabled = true
+        deleteButton.isHidden = true
     }
     
     @objc private func checkInButtonTapped(_ sender: UIButton) {
@@ -355,16 +340,16 @@ extension ViewController {
             return
         }
         
-        guard let workflow = self.viewModel?.checkInMilestone else { return }
-        
-        workflow.forEach({
-            
-            guard currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed else {
-                return
-            }
-            if currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed{
+        guard var currentMilestone = self.viewModel?.currentMilestone else { return }
+//
+//        workflow.forEach({
+        guard currentMilestone.stopMilestoneType == MilestoneType.checkIn.rawValue && !currentMilestone.completed else { return }
+//            guard self.viewModel?.currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed else {
+//                return
+//            }
+//            if self.viewModel?.currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed{
                 
-                for question in $0.questions {
+                for question in currentMilestone.questions {
                     if question.questionName == "CheckedInDateTime" {
                         guard let checkinDate = self.checkinDate else { return }
                         //MM-dd-yyyy HH:mm
@@ -372,39 +357,38 @@ extension ViewController {
                         let date = convertDateToString(date: checkinDate, format: "MM-dd-yyyy HH:mm")
                         let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: date, availableResponses: question.availableResponses)
                         print(currentQuestion)
-                        print("before ", self.currentMilestone?.questions.first(where: {$0.questionName == question.questionName }))
+                        print("before ", currentMilestone.questions.first(where: {$0.questionName == question.questionName }))
                         
-                        guard let Q = self.currentMilestone?.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
-                        self.currentMilestone?.questions.remove(at: Q)
+                        guard let Q = currentMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
+                        currentMilestone.questions.remove(at: Q)
                         
-                        print("when removing :", self.currentMilestone?.questions.first(where: {$0.questionName == question.questionName }))
+                        print("when removing :", currentMilestone.questions.first(where: {$0.questionName == question.questionName }))
                         
-                        self.currentMilestone?.questions.insert(currentQuestion, at: Q)
-                        self.currentMilestone?.completed = true
+                        currentMilestone.questions.insert(currentQuestion, at: Q)
+                        currentMilestone.completed = true
                     }
                 }
+//            }
+//        })
+        
+        self.viewModel?.currentMilestone = currentMilestone
+//        guard let milestonToSave = self.viewModel?.currentMilestone else { return }
+        
+        self.viewModel?.checkIn(item: currentMilestone, vc: self, completion: { saved in
+            switch saved {
+            case true:
+                self.deleteButton.isHidden = false
+                self.checkInToggle.isEnabled = false
+                self.datePicker.isEnabled = false
+                self.submitButton.setTitle("Submitted", for: .normal)
+                self.submitButton.setTitleColor(.systemBlue, for: .disabled)
+                self.submitButton.backgroundColor = .clear
+                self.submitButton.isEnabled = false
+            case false:
+                self.customAlert(title: "Ehh something is wrong", message: "not saved", buttonTitle: "Try again..")
+                break
             }
         })
-            
-            self.viewModel?.checkIn(item: self.currentMilestone!, vc: self, completion: { saved in
-                switch saved {
-                case true:
-                    self.deleteButton.isHidden = false
-                    self.checkInToggle.isEnabled = false
-                    self.datePicker.isEnabled = false
-                    self.submitButton.setTitle("Submitted", for: .normal)
-                    self.submitButton.setTitleColor(.systemBlue, for: .disabled)
-                    self.submitButton.backgroundColor = .clear
-                    self.submitButton.isEnabled = false
-                case false:
-                    self.customAlert(title: "Ehh something is wrong", message: "not saved", buttonTitle: "Try again..")
-                    break
-                }
-            })
-    }
-    
-    private func submitAction(type: MilestoneType) {
-        
     }
 }
 
