@@ -1,16 +1,20 @@
 PODS:
   - Anchorage (4.5.0)
+  - M13Checkbox (3.4.0)
 
 DEPENDENCIES:
   - Anchorage
+  - M13Checkbox
 
 SPEC REPOS:
   trunk:
     - Anchorage
+    - M13Checkbox
 
 SPEC CHECKSUMS:
   Anchorage: 1961bc81c84aeed54ad7ffc697c50cd9de748ba6
+  M13Checkbox: 6f59404540ac98ba83a3d1afac335895a40c6a5d
 
-PODFILE CHECKSUM: c6e6800e048a09028907c8dcffbdc6ee8b6c0d0a
+PODFILE CHECKSUM: 8ba907b994b1c34e180b4e0c5ebd168f3b308140
 
 COCOAPODS: 1.11.2

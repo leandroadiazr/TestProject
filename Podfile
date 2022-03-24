@@ -7,5 +7,6 @@ target 'TestProject' do
 
   # Pods for TestProject
  pod 'Anchorage'
+pod 'M13Checkbox'
 
 end

@@ -14,16 +14,20 @@
 		E87B5FD227E7C7F20068A3DE /* LoMat.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87B5FD127E7C7F20068A3DE /* LoMat.swift */; };
 		E87B5FD427E7C8110068A3DE /* workflow.json in Resources */ = {isa = PBXBuildFile; fileRef = E87B5FD327E7C8110068A3DE /* workflow.json */; };
 		E87B5FD727E7C8490068A3DE /* ExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87B5FD627E7C8490068A3DE /* ExtensionViewController.swift */; };
+		E8A6C16E27EBCEC300D3D846 /* ContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A6C16D27EBCEC300D3D846 /* ContentViewModel.swift */; };
+		E8A6C17027EBECD300D3D846 /* BinaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A6C16F27EBECD300D3D846 /* BinaryView.swift */; };
+		E8A6C17227EBEFB400D3D846 /* RadioButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A6C17127EBEFB400D3D846 /* RadioButton.swift */; };
+		E8BAC44A27EBCC9600609D7E /* SelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BAC44927EBCC9600609D7E /* SelectorViewController.swift */; };
 		E8D1E5A027E135F000C009D1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E59F27E135F000C009D1 /* AppDelegate.swift */; };
 		E8D1E5A227E135F000C009D1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5A127E135F000C009D1 /* SceneDelegate.swift */; };
-		E8D1E5A427E135F000C009D1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5A327E135F000C009D1 /* ViewController.swift */; };
+		E8D1E5A427E135F000C009D1 /* MilestonesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5A327E135F000C009D1 /* MilestonesViewController.swift */; };
 		E8D1E5A727E135F000C009D1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8D1E5A527E135F000C009D1 /* Main.storyboard */; };
 		E8D1E5A927E135F200C009D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8D1E5A827E135F200C009D1 /* Assets.xcassets */; };
 		E8D1E5AC27E135F200C009D1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8D1E5AA27E135F200C009D1 /* LaunchScreen.storyboard */; };
 		E8D1E5B527E136BA00C009D1 /* CustomTitleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5B427E136BA00C009D1 /* CustomTitleLabel.swift */; };
 		E8D1E5B727E1371000C009D1 /* CustomSubtitleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5B627E1371000C009D1 /* CustomSubtitleLabel.swift */; };
 		E8D1E5BC27E1376F00C009D1 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5BB27E1376F00C009D1 /* CustomButton.swift */; };
-		E8D1E5BE27E137C800C009D1 /* Checking.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5BD27E137C800C009D1 /* Checking.swift */; };
+		E8D1E5BE27E137C800C009D1 /* LoadedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D1E5BD27E137C800C009D1 /* LoadedView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,10 +40,14 @@
 		E87B5FD127E7C7F20068A3DE /* LoMat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoMat.swift; sourceTree = "<group>"; };
 		E87B5FD327E7C8110068A3DE /* workflow.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = workflow.json; sourceTree = "<group>"; };
 		E87B5FD627E7C8490068A3DE /* ExtensionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtensionViewController.swift; sourceTree = "<group>"; };
+		E8A6C16D27EBCEC300D3D846 /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
+		E8A6C16F27EBECD300D3D846 /* BinaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BinaryView.swift; sourceTree = "<group>"; };
+		E8A6C17127EBEFB400D3D846 /* RadioButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioButton.swift; sourceTree = "<group>"; };
+		E8BAC44927EBCC9600609D7E /* SelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectorViewController.swift; sourceTree = "<group>"; };
 		E8D1E59C27E135F000C009D1 /* TestProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D1E59F27E135F000C009D1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E8D1E5A127E135F000C009D1 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		E8D1E5A327E135F000C009D1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E8D1E5A327E135F000C009D1 /* MilestonesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestonesViewController.swift; sourceTree = "<group>"; };
 		E8D1E5A627E135F000C009D1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E8D1E5A827E135F200C009D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E8D1E5AB27E135F200C009D1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -47,7 +55,7 @@
 		E8D1E5B427E136BA00C009D1 /* CustomTitleLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTitleLabel.swift; sourceTree = "<group>"; };
 		E8D1E5B627E1371000C009D1 /* CustomSubtitleLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSubtitleLabel.swift; sourceTree = "<group>"; };
 		E8D1E5BB27E1376F00C009D1 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
-		E8D1E5BD27E137C800C009D1 /* Checking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checking.swift; sourceTree = "<group>"; };
+		E8D1E5BD27E137C800C009D1 /* LoadedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadedView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,7 +115,8 @@
 		E87B5FCE27E7C7C00068A3DE /* Screens */ = {
 			isa = PBXGroup;
 			children = (
-				E8D1E5A327E135F000C009D1 /* ViewController.swift */,
+				E8D1E5A327E135F000C009D1 /* MilestonesViewController.swift */,
+				E8BAC44927EBCC9600609D7E /* SelectorViewController.swift */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -138,6 +147,14 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		E8A6C16C27EBCEB200D3D846 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				E8A6C16D27EBCEC300D3D846 /* ContentViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 		E8D1E59327E135F000C009D1 = {
 			isa = PBXGroup;
 			children = (
@@ -159,6 +176,7 @@
 		E8D1E59E27E135F000C009D1 /* TestProject */ = {
 			isa = PBXGroup;
 			children = (
+				E8A6C16C27EBCEB200D3D846 /* ViewModel */,
 				E87B5FD527E7C8490068A3DE /* Utilities */,
 				E87B5FD027E7C7E50068A3DE /* Model */,
 				E8D1E5B327E1369900C009D1 /* Components */,
@@ -197,6 +215,7 @@
 			isa = PBXGroup;
 			children = (
 				E8D1E5BB27E1376F00C009D1 /* CustomButton.swift */,
+				E8A6C17127EBEFB400D3D846 /* RadioButton.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -204,7 +223,8 @@
 		E8D1E5BA27E1375A00C009D1 /* ViewComponents */ = {
 			isa = PBXGroup;
 			children = (
-				E8D1E5BD27E137C800C009D1 /* Checking.swift */,
+				E8D1E5BD27E137C800C009D1 /* LoadedView.swift */,
+				E8A6C16F27EBECD300D3D846 /* BinaryView.swift */,
 			);
 			path = ViewComponents;
 			sourceTree = "<group>";
@@ -326,14 +346,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				E87B5FC727E171330068A3DE /* ActionClass.swift in Sources */,
-				E8D1E5A427E135F000C009D1 /* ViewController.swift in Sources */,
+				E8A6C17027EBECD300D3D846 /* BinaryView.swift in Sources */,
+				E8D1E5A427E135F000C009D1 /* MilestonesViewController.swift in Sources */,
 				E86997E027E1D6ED004B5653 /* NetworkManager.swift in Sources */,
 				E8D1E5A027E135F000C009D1 /* AppDelegate.swift in Sources */,
 				E8D1E5BC27E1376F00C009D1 /* CustomButton.swift in Sources */,
-				E8D1E5BE27E137C800C009D1 /* Checking.swift in Sources */,
+				E8D1E5BE27E137C800C009D1 /* LoadedView.swift in Sources */,
+				E8A6C17227EBEFB400D3D846 /* RadioButton.swift in Sources */,
 				E8D1E5A227E135F000C009D1 /* SceneDelegate.swift in Sources */,
 				E8D1E5B527E136BA00C009D1 /* CustomTitleLabel.swift in Sources */,
+				E8BAC44A27EBCC9600609D7E /* SelectorViewController.swift in Sources */,
 				E8D1E5B727E1371000C009D1 /* CustomSubtitleLabel.swift in Sources */,
+				E8A6C16E27EBCEC300D3D846 /* ContentViewModel.swift in Sources */,
 				E87B5FCA27E1725A0068A3DE /* Coordinator.swift in Sources */,
 				E87B5FD727E7C8490068A3DE /* ExtensionViewController.swift in Sources */,
 				E87B5FD227E7C7F20068A3DE /* LoMat.swift in Sources */,
