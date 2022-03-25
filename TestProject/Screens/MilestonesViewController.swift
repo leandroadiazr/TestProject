@@ -20,25 +20,49 @@ enum MilestoneType: String, CaseIterable {
 
 class MilestonesViewController: UIViewController {
     
+    lazy var stopLabel: UILabel = {
+        let label = CustomTitleLabel(textAlignment: .left, fontSize: 16, text: "Pick 1 - Walmart Supercenter")
+        return label
+    }()
+    
+    
     var viewModel: ContentViewModel? {
         didSet {
             guard let milestones = viewModel?.allMilestones else { return }
+            let milestoneType = milestones.forEach({ $0.stopMilestoneType })
             
+            //MARK: CHECKIN MILESTONE
             guard let checkInMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.checkIn.rawValue }) else { return }
             
             if checkInMilestone.completed {
                 self.isCheckinCompleted(milestone: checkInMilestone)
-                self.changeVisibility(hidden: false)
+                self.changeCheckinVisibility(hidden: false)
             } else {
                 viewModel?.currentMilestone = checkInMilestone
-                self.changeVisibility(hidden: true)
-                
+                self.changeCheckinVisibility(hidden: true)
             }
             
+            
             guard let loadedMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.loaded.rawValue }) else { return }
+            if loadedMilestone.completed {
+                //                self.isloadedCompleted(milestone: loadedMilestone)
+            } else {
+                viewModel?.currentMilestone = loadedMilestone
+            }
+            
             guard let uploadMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.upload.rawValue }) else { return }
+            
+            if uploadMilestone.completed {
+                //upload milestone
+            } else {
+                //upload milestone
+            }
+            if viewModel?.currentMilestone?.stopMilestoneType != MilestoneType.loaded.rawValue {
+                self.changeLoadedVisibility(hidden: true)
+            }
         }
     }
+    
     //MARK: -CHECK IN FUNTIONALITIES
     private func isCheckinCompleted(milestone: LoMAT.StopMilestone) {
         self.checkingLabel.text = "Already checked in"
@@ -53,14 +77,10 @@ class MilestonesViewController: UIViewController {
             checkInDatePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
             checkInDatePicker.isEnabled = false
         }
-        self.changeVisibility(hidden: false)
+        self.changeCheckinVisibility(hidden: false)
         checkInSubmitButton.backgroundColor = .clear
     }
     
-    lazy var stopLabel: UILabel = {
-        let label = CustomTitleLabel(textAlignment: .left, fontSize: 16, text: "Pick 1 - Walmart Supercenter")
-        return label
-    }()
     
     //MARK: CHECK IN
     //MARK: - Toggle Button
@@ -81,24 +101,34 @@ class MilestonesViewController: UIViewController {
         let toggle = UISwitch()
         toggle.onTintColor = .systemGreen
         toggle.addTarget(self, action: #selector(toggleChangedValue), for: .valueChanged)
+        toggle.tag = 1
         return toggle
     }()
     
     @objc private func toggleChangedValue(_ toggle: UISwitch) {
-        toggleChanged = toggle.isOn ? true : false
-        print(toggleChanged)
+        //check in
+        if toggle.tag == 1 {
+            checkinToggleChanged = toggle.isOn ? true : false
+            print(checkinToggleChanged)
+        }
+        
+        //loaded
+        if toggle.tag == 2 {
+            loadedToggleChanged = toggle.isOn ? true : false
+            print(loadedToggleChanged)
+        }
     }
     
-    private var toggleChanged: Bool = false {
+    private var checkinToggleChanged: Bool = false {
         didSet {
-            checkInToggle.isOn = toggleChanged
-            changeVisibility(hidden: !toggleChanged)
-            checkInSubmitButton.backgroundColor = !toggleChanged ? .lightGray : .systemBlue
+            checkInToggle.isOn = checkinToggleChanged
+            changeCheckinVisibility(hidden: !checkinToggleChanged)
+            checkInSubmitButton.backgroundColor = !checkinToggleChanged ? .lightGray : .systemBlue
         }
     }
     
     //MARK: - Date Picker
-    lazy var pickerSeparator: UIView = {
+    lazy var checkinPickerSeparator: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBlue
         view.widthAnchor == 8
@@ -131,7 +161,7 @@ class MilestonesViewController: UIViewController {
         }
     }
     
-    //MARK: - Submit Button
+    //MARK: - Check in Submit Button
     lazy var checkInSubmitButton: UIButton = {
         let btn = CustomButton(backgroundColor: .systemBlue, title: "Submit")
         btn.addTarget(self, action: #selector(checkInButtonTapped(_:)), for: .touchUpInside)
@@ -157,13 +187,15 @@ class MilestonesViewController: UIViewController {
     
     lazy var checkInDatePickerView: UIView = {
         let view = UIView()
-        view.addSubview(pickerSeparator)
+        view.addSubview(checkinPickerSeparator)
         view.addSubview(checkInDateLabel)
         view.addSubview(checkInDatePicker)
         view.layer.borderWidth = 0.2
         view.backgroundColor = .white
         return view
     }()
+    
+    
     
     //MARK: - END CHECK IN
     //MARK: - END CHECK IN
@@ -176,9 +208,31 @@ class MilestonesViewController: UIViewController {
     }()
     
     
+    //MARK: - LOADED
+    //MARK: - LOADED
+    //MARK: - LOADED
+    //MARK: - LOADED
+    //MARK: - LOADED
+    //MARK: - LOADED
     
-    //MARK: - LOADED
-    //MARK: - LOADED
+    private func isloadedCompleted(milestone: LoMAT.StopMilestone) {
+        loadedSeparator.isHidden = true
+        
+        self.checkingLabel.text = "Already checked in"
+        loadedToggle.isOn = true
+        loadedToggle.isEnabled = false
+        checkInSubmitButton.setTitle("Submited", for: .normal)
+        checkInSubmitButton.isEnabled = false
+        checkInSubmitButton.setTitleColor(.systemBlue, for: .disabled)
+        guard let milestones = self.viewModel?.allMilestones?.first(where: { $0.stopMilestoneType == MilestoneType.loaded.rawValue }) else { return }
+        guard let dateQuestion = milestones.questions.first(where: { $0.questionName == "LoadedTime" }) else { return }
+        if let date = dateQuestion.selectedAnswer {
+            loadedDatePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
+            loadedDatePicker.isEnabled = false
+        }
+        self.changeLoadedVisibility(hidden: false)
+        //        loadedSubmitButton.backgroundColor = .clear
+    }
     
     lazy var loadedSeparator: UIView = {
         let view = UIView()
@@ -195,12 +249,16 @@ class MilestonesViewController: UIViewController {
     lazy var loadedToggle: UISwitch = {
         let toggle = UISwitch()
         toggle.onTintColor = .systemGreen
+        toggle.addTarget(self, action: #selector(toggleChangedValue), for: .valueChanged)
+        toggle.tag = 2
         return toggle
     }()
+    
     
     private var loadedToggleChanged: Bool = false {
         didSet {
             loadedToggle.isOn = loadedToggleChanged
+            changeLoadedVisibility(hidden: !loadedToggleChanged)
         }
     }
     
@@ -214,7 +272,14 @@ class MilestonesViewController: UIViewController {
     
     //MARK: - loaded picker
     
-    lazy var loadedTimeLabel: UILabel = {
+    lazy var loadedPickerSeparator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBlue
+        view.widthAnchor == 8
+        return view
+    }()
+    
+    lazy var loadedDateLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 14, text: "Time")
         return label
     }()
@@ -223,17 +288,33 @@ class MilestonesViewController: UIViewController {
         let picker = UIDatePicker()
         picker.datePickerMode = .dateAndTime
         picker.preferredDatePickerStyle = .compact
-        picker.addTarget(self, action: #selector(checkInDateSelected), for: .editingDidEnd)
+        picker.addTarget(self, action: #selector(loadedDateSelected), for: .editingDidEnd)
         return picker
     }()
     
-    lazy var loadedStackPickerView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [loadedTimeLabel, loadedDatePicker])
-        stack.distribution = .equalSpacing
-        stack.spacing = 10
-        stack.axis = .horizontal
-        return stack
+    lazy var loadedDatePickerView: UIView = {
+        let view = UIView()
+        view.addSubview(loadedPickerSeparator)
+        view.addSubview(loadedDateLabel)
+        view.addSubview(loadedDatePicker)
+        view.layer.borderWidth = 0.2
+        view.backgroundColor = .white
+        return view
     }()
+    
+    @objc func loadedDateSelected(_ picker: UIDatePicker) {
+        loadedDate = picker.date
+    }
+    
+    private var loadedDate: Date? {
+        didSet {
+            if let date = loadedDate {
+                loadedDatePicker.date = date
+                print("Loaded date", date)
+            }
+        }
+    }
+    
     
     let loadedMainQuestionTitle = CustomTitleLabel(textAlignment: .left, fontSize: 14, text: "Were there any issues?")
     
@@ -245,50 +326,77 @@ class MilestonesViewController: UIViewController {
     }()
     
     lazy var selectedCheckBoxOne: M13Checkbox = {
-       let checkbox = M13Checkbox()
-//        checkbox.frame = CGRect(x: 0, y: 0, width: 20, height: 20)
+        let checkbox = M13Checkbox()
         checkbox.boxType = .circle
         checkbox.markType = .radio
         checkbox.checkState = .unchecked
-        checkbox.tintColor = .red
-        checkbox.backgroundColor = .yellow
-        checkbox.heightAnchor == 20
-        checkbox.widthAnchor == 20
+        checkbox.tintColor = .systemRed
+        checkbox.heightAnchor == 25
+        checkbox.widthAnchor == 25
+        checkbox.addTarget(self, action: #selector(selectedAnswerValue), for: .valueChanged)
+        checkbox.tag = 1
         return checkbox
     }()
-             
+    
+    
+    
     lazy var thumbsImageDown: UIImageView = {
         let view = UIImageView(image: UIImage(systemName: "hand.thumbsdown"))
-        view.frame = CGRect(x: 0, y: 0, width: 15, height: 15)
-        let img = UIImage(systemName: "hand.thumbsdown")
+        view.tintColor = .systemRed
         return view
     }()
     
     lazy var questionProblemsLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 11, text: "Problems")
+        label.tintColor = .systemRed
         return label
     }()
     
     lazy var selectedCheckBoxTwo: M13Checkbox = {
-       let checkbox = M13Checkbox()
+        let checkbox = M13Checkbox()
         checkbox.boxType = .circle
         checkbox.markType = .radio
         checkbox.checkState = .unchecked
-        checkbox.tintColor = .red
-        checkbox.heightAnchor == 15
-        checkbox.widthAnchor == 15
+        checkbox.tintColor = .systemBlue
+        checkbox.heightAnchor == 25
+        checkbox.widthAnchor == 25
+        checkbox.tag = 2
+        checkbox.addTarget(self, action: #selector(selectedAnswerValue), for: .valueChanged)
         return checkbox
     }()
-             
+    
     lazy var thumbsImageUp: UIImageView = {
         let view = UIImageView(image: UIImage(systemName: "hand.thumbsup"))
+        view.tintColor = .systemBlue
         return view
     }()
     
     lazy var questionNoIssuesLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 11, text: "No Issues")
+        label.tintColor = .systemBlue
         return label
     }()
+    
+    @objc private func selectedAnswerValue(_ box: M13Checkbox) {
+        switch box.tag {
+        case 1:
+            selectedCheckBoxOne.stateChangeAnimation = .fill
+            selectedCheckBoxTwo.checkState = .unchecked
+            selectedAnswer = "Yes"
+        case 2:
+            selectedCheckBoxTwo.stateChangeAnimation = .fill
+            selectedCheckBoxOne.checkState = .unchecked
+            selectedAnswer = "No"
+        default:
+            break
+        }
+    }
+    
+    private var selectedAnswer: String? {
+        didSet {
+            print(selectedAnswer)
+        }
+    }
     
     lazy var loadedQuestionStack: UIView = {
         let stack = UIView()
@@ -311,14 +419,12 @@ class MilestonesViewController: UIViewController {
         let view = UIView()
         view.addSubview(loadedSeparator)
         view.addSubview(loadedLabelSwitchStack)
-        view.addSubview(loadedStackPickerView)
-        view.addSubview(loadedQuestionStack)
         view.backgroundColor = .white
-        view.layer.borderWidth = 1
+        view.layer.borderWidth = 0.2
         return view
     }()
-
-
+    
+    
     
     //MARK: -- LIFE CYCLE
     override func viewDidLoad() {
@@ -329,7 +435,7 @@ class MilestonesViewController: UIViewController {
         configure()
         initContentViewModel()
         loadData()
-        checkInSubmitButton.backgroundColor = !toggleChanged ? .lightGray : .systemBlue
+        checkInSubmitButton.backgroundColor = !checkinToggleChanged ? .lightGray : .systemBlue
         //        flushSystem()
     }
     
@@ -342,11 +448,18 @@ class MilestonesViewController: UIViewController {
         }
     }
     
-    private func changeVisibility(hidden: Bool = true) {
+    private func changeCheckinVisibility(hidden: Bool = true) {
         self.deleteButton.isHidden = hidden
         checkInDateLabel.isHidden = hidden
         checkInDatePicker.isHidden = hidden
         checkInDatePickerView.isHidden = hidden
+    }
+    
+    private func changeLoadedVisibility(hidden: Bool = true) {
+        self.deleteButton.isHidden = hidden
+        //        loadedSeparator.isHidden = hidden
+        loadedDateLabel.isHidden = hidden
+        loadedDatePicker.isHidden = hidden
     }
     
     private func initContentViewModel() {
@@ -378,97 +491,14 @@ class MilestonesViewController: UIViewController {
         view.addSubview(checkInView)
         view.addSubview(checkInDatePickerView)
         view.addSubview(checkInSubmitButton)
-//        view.addSubview(deleteButton)
+        //        view.addSubview(deleteButton)
         view.addSubview(loadedView)
+        view.addSubview(loadedDatePickerView)
+        view.addSubview(loadedQuestionStack)
         setupConstraints()
     }
-
     
-    func setupConstraints() {
-        let padding: CGFloat = 20
-        
-        stopLabel.topAnchor == view.topAnchor + 100
-        stopLabel.leadingAnchor == view.leadingAnchor + padding
-        
-        //MARK: - CEHCK IN
-        checkInView.topAnchor == stopLabel.bottomAnchor + padding
-        checkInView.horizontalAnchors == view.horizontalAnchors
-        checkInView.heightAnchor == 70
-        
-        checkinSeparator.verticalAnchors == checkInView.verticalAnchors
-        
-        checkInLabelsStack.topAnchor == checkInView.topAnchor + padding
-        checkInLabelsStack.horizontalAnchors == checkInView.horizontalAnchors + padding
-        
-        pickerSeparator.verticalAnchors == checkInDatePickerView.verticalAnchors
-        
-        checkInDatePickerView.topAnchor == checkInView.bottomAnchor
-        checkInDatePickerView.horizontalAnchors == view.horizontalAnchors
-        checkInDatePickerView.heightAnchor == 80
-        
-        checkInDateLabel.centerYAnchor == checkInDatePicker.centerYAnchor
-        checkInDateLabel.leadingAnchor == checkInDatePickerView.leadingAnchor + padding
-        
-        checkInDatePicker.topAnchor == checkInDatePickerView.topAnchor
-        checkInDatePicker.leadingAnchor == checkInDatePickerView.centerXAnchor - padding
-        checkInDatePicker.trailingAnchor == checkInDatePickerView.trailingAnchor
-        checkInDatePicker.heightAnchor == 80
-        
-        checkInSubmitButton.topAnchor == checkInDatePickerView.bottomAnchor + 10
-        checkInSubmitButton.centerXAnchor == view.centerXAnchor
-        checkInSubmitButton.widthAnchor == 100
-        
-        
-        //MARK: - LOADED
-        
-        loadedView.topAnchor == checkInSubmitButton.bottomAnchor + padding
-        loadedView.horizontalAnchors == view.horizontalAnchors
-        loadedView.heightAnchor == 200
-        
-        loadedSeparator.verticalAnchors == loadedView.verticalAnchors
-//        loadedSeparator.leadingAnchor == view.leadingAnchor
-        
-        loadedLabelSwitchStack.topAnchor == loadedView.topAnchor + padding
-        loadedLabelSwitchStack.horizontalAnchors == loadedView.horizontalAnchors + padding
-        loadedView.heightAnchor == 70
-
-        loadedStackPickerView.topAnchor == loadedLabelSwitchStack.bottomAnchor + 2
-        loadedStackPickerView.horizontalAnchors == loadedView.horizontalAnchors + padding
-        loadedStackPickerView.heightAnchor == 80
-        
-        loadedQuestionStack.topAnchor == loadedStackPickerView.bottomAnchor + 2
-        loadedQuestionStack.horizontalAnchors == loadedView.horizontalAnchors
-        loadedQuestionStack.heightAnchor == 100
-        
-        
-        loadedMainQuestionTitle.topAnchor == loadedQuestionStack.topAnchor + 5
-        loadedMainQuestionTitle.leadingAnchor == loadedView.leadingAnchor + padding
-        
-        loadedQuestionSeparator.verticalAnchors == loadedQuestionStack.verticalAnchors
-
-        selectedCheckBoxOne.centerYAnchor == loadedQuestionStack.centerYAnchor
-        selectedCheckBoxOne.leadingAnchor == loadedQuestionStack.leadingAnchor + padding * 2
-        
-        thumbsImageDown.leadingAnchor == selectedCheckBoxOne.trailingAnchor + padding
-        thumbsImageDown.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        questionNoIssuesLabel.leadingAnchor == thumbsImageDown.trailingAnchor + padding
-        questionNoIssuesLabel.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        
-        selectedCheckBoxTwo.leadingAnchor == loadedQuestionStack.centerXAnchor + padding
-        selectedCheckBoxTwo.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        thumbsImageUp.leadingAnchor == selectedCheckBoxTwo.trailingAnchor + padding
-        thumbsImageUp.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        questionProblemsLabel.leadingAnchor == thumbsImageUp.trailingAnchor + padding
-        questionProblemsLabel.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-//        deleteButton.topAnchor == loadedView.bottomAnchor + 10
-//        deleteButton.trailingAnchor == view.trailingAnchor -  10
-//        deleteButton.widthAnchor == 70
-    }
+    
     
 }
 
@@ -507,45 +537,47 @@ extension MilestonesViewController {
         deleteButton.isHidden = true
     }
     
+    
+    //MARK: CHECK IN BUTTON ACTION
     @objc private func checkInButtonTapped(_ sender: UIButton) {
-        guard toggleChanged && checkinDate != nil else {
+        guard checkinToggleChanged && checkinDate != nil else {
             self.customAlert(title: "Choose Date ", message: "Trya again", buttonTitle: "ok")
             return
         }
         
         guard var currentMilestone = self.viewModel?.currentMilestone else { return }
-//
-//        workflow.forEach({
+        //
+        //        workflow.forEach({
         guard currentMilestone.stopMilestoneType == MilestoneType.checkIn.rawValue && !currentMilestone.completed else { return }
-//            guard self.viewModel?.currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed else {
-//                return
-//            }
-//            if self.viewModel?.currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed{
+        //            guard self.viewModel?.currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed else {
+        //                return
+        //            }
+        //            if self.viewModel?.currentMilestone?.stopMilestoneType == $0.stopMilestoneType && !$0.completed{
+        
+        for question in currentMilestone.questions {
+            if question.questionName == "CheckedInDateTime" {
+                guard let checkinDate = self.checkinDate else { return }
+                //MM-dd-yyyy HH:mm
+                //"MM/dd/yyyy"
+                let date = convertDateToString(date: checkinDate, format: "MM-dd-yyyy HH:mm")
+                let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: date, availableResponses: question.availableResponses)
+                print(currentQuestion)
+                print("before ", currentMilestone.questions.first(where: {$0.questionName == question.questionName }))
                 
-                for question in currentMilestone.questions {
-                    if question.questionName == "CheckedInDateTime" {
-                        guard let checkinDate = self.checkinDate else { return }
-                        //MM-dd-yyyy HH:mm
-                        //"MM/dd/yyyy"
-                        let date = convertDateToString(date: checkinDate, format: "MM-dd-yyyy HH:mm")
-                        let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: date, availableResponses: question.availableResponses)
-                        print(currentQuestion)
-                        print("before ", currentMilestone.questions.first(where: {$0.questionName == question.questionName }))
-                        
-                        guard let Q = currentMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
-                        currentMilestone.questions.remove(at: Q)
-                        
-                        print("when removing :", currentMilestone.questions.first(where: {$0.questionName == question.questionName }))
-                        
-                        currentMilestone.questions.insert(currentQuestion, at: Q)
-                        currentMilestone.completed = true
-                    }
-                }
-//            }
-//        })
+                guard let Q = currentMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
+                currentMilestone.questions.remove(at: Q)
+                
+                print("when removing :", currentMilestone.questions.first(where: {$0.questionName == question.questionName }))
+                
+                currentMilestone.questions.insert(currentQuestion, at: Q)
+                currentMilestone.completed = true
+            }
+        }
+        //            }
+        //        })
         
         self.viewModel?.currentMilestone = currentMilestone
-//        guard let milestonToSave = self.viewModel?.currentMilestone else { return }
+        //        guard let milestonToSave = self.viewModel?.currentMilestone else { return }
         
         self.viewModel?.checkIn(item: currentMilestone, vc: self, completion: { saved in
             switch saved {
@@ -567,3 +599,105 @@ extension MilestonesViewController {
 
 public typealias VoidClosure = () -> Void
 
+
+
+extension MilestonesViewController {
+    
+    func setupConstraints() {
+        let padding: CGFloat = 20
+        
+        stopLabel.topAnchor == view.topAnchor + 100
+        stopLabel.leadingAnchor == view.leadingAnchor + padding
+        
+        //MARK: - CEHCK IN
+        checkInView.topAnchor == stopLabel.bottomAnchor + padding
+        checkInView.horizontalAnchors == view.horizontalAnchors
+        checkInView.heightAnchor == 70
+        
+        checkinSeparator.verticalAnchors == checkInView.verticalAnchors
+        
+        checkInLabelsStack.topAnchor == checkInView.topAnchor + padding
+        checkInLabelsStack.horizontalAnchors == checkInView.horizontalAnchors + padding
+        
+        checkinPickerSeparator.verticalAnchors == checkInDatePickerView.verticalAnchors
+        
+        checkInDatePickerView.topAnchor == checkInView.bottomAnchor
+        checkInDatePickerView.horizontalAnchors == view.horizontalAnchors
+        checkInDatePickerView.heightAnchor == 80
+        
+        checkInDateLabel.centerYAnchor == checkInDatePicker.centerYAnchor
+        checkInDateLabel.leadingAnchor == checkInDatePickerView.leadingAnchor + padding
+        
+        checkInDatePicker.topAnchor == checkInDatePickerView.topAnchor
+        checkInDatePicker.leadingAnchor == checkInDatePickerView.centerXAnchor - padding
+        checkInDatePicker.trailingAnchor == checkInDatePickerView.trailingAnchor - padding
+        checkInDatePicker.heightAnchor == 80
+        
+        checkInSubmitButton.topAnchor == checkInDatePickerView.bottomAnchor + 10
+        checkInSubmitButton.centerXAnchor == view.centerXAnchor
+        checkInSubmitButton.widthAnchor == 100
+        
+        
+        //MARK: - LOADED
+        
+        loadedView.topAnchor == checkInSubmitButton.bottomAnchor + padding
+        loadedView.horizontalAnchors == view.horizontalAnchors
+        loadedView.heightAnchor == 70
+        //        loadedView.heightAnchor == 200
+        
+        loadedSeparator.verticalAnchors == loadedView.verticalAnchors
+        //        loadedSeparator.leadingAnchor == view.leadingAnchor
+        
+        loadedLabelSwitchStack.centerYAnchor == loadedView.centerYAnchor
+        loadedLabelSwitchStack.horizontalAnchors == loadedView.horizontalAnchors + padding
+        
+        
+        //date picker view
+        loadedDatePickerView.topAnchor == loadedView.bottomAnchor
+        loadedDatePickerView.horizontalAnchors == loadedView.horizontalAnchors
+        loadedDatePickerView.heightAnchor == 80
+        
+        loadedPickerSeparator.verticalAnchors == loadedDatePickerView.verticalAnchors
+        
+        loadedDateLabel.leadingAnchor == loadedDatePickerView.leadingAnchor + padding
+        loadedDateLabel.centerYAnchor == loadedDatePickerView.centerYAnchor
+        loadedDatePicker.trailingAnchor == loadedDatePickerView.trailingAnchor - padding
+        loadedDatePicker.centerYAnchor == loadedDatePickerView.centerYAnchor
+        
+        
+        //questions
+        
+        loadedQuestionStack.topAnchor == loadedDatePickerView.bottomAnchor
+        loadedQuestionStack.horizontalAnchors == loadedView.horizontalAnchors
+        loadedQuestionStack.heightAnchor == 100
+        
+        
+        loadedMainQuestionTitle.topAnchor == loadedQuestionStack.topAnchor + 5
+        loadedMainQuestionTitle.leadingAnchor == loadedView.leadingAnchor + padding
+        
+        loadedQuestionSeparator.verticalAnchors == loadedQuestionStack.verticalAnchors
+        
+        selectedCheckBoxOne.centerYAnchor == loadedQuestionStack.centerYAnchor
+        selectedCheckBoxOne.leadingAnchor == loadedQuestionStack.leadingAnchor + padding * 2
+        
+        thumbsImageDown.leadingAnchor == selectedCheckBoxOne.trailingAnchor + padding
+        thumbsImageDown.centerYAnchor == loadedQuestionStack.centerYAnchor
+        
+        questionProblemsLabel.leadingAnchor == thumbsImageDown.trailingAnchor + padding
+        questionProblemsLabel.centerYAnchor == loadedQuestionStack.centerYAnchor
+        
+        
+        selectedCheckBoxTwo.leadingAnchor == loadedQuestionStack.centerXAnchor + padding
+        selectedCheckBoxTwo.centerYAnchor == loadedQuestionStack.centerYAnchor
+        
+        thumbsImageUp.leadingAnchor == selectedCheckBoxTwo.trailingAnchor + padding
+        thumbsImageUp.centerYAnchor == loadedQuestionStack.centerYAnchor
+        
+        questionNoIssuesLabel.leadingAnchor == thumbsImageUp.trailingAnchor + padding
+        questionNoIssuesLabel.centerYAnchor == loadedQuestionStack.centerYAnchor
+        
+        //        deleteButton.topAnchor == loadedView.bottomAnchor + 10
+        //        deleteButton.trailingAnchor == view.trailingAnchor -  10
+        //        deleteButton.widthAnchor == 70
+    }
+}

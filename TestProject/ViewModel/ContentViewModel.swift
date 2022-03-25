@@ -13,6 +13,7 @@ class ContentViewModel {
     var allMilestones: [LoMAT.StopMilestone]?
     var currentMilestone: LoMAT.StopMilestone?
     var questions: [LoMAT.Question]?
+    var questionType: LoMAT.Question?
     
     init(milestones: [LoMAT.StopMilestone]?) {
         if let milestones = milestones {
