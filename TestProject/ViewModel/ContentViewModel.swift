@@ -22,6 +22,8 @@ class ContentViewModel {
                 self.questions?.append(contentsOf: milestone.questions)
             }
         }
+//        self.currentMilestone = milestones?.first(where: {$0.completed == false })
+        print(currentMilestone)
     }
     
     
@@ -41,6 +43,9 @@ class ContentViewModel {
             }
             completion(false)
         }
+        
+        
+  
     }
     
     //MARK: Delete All
