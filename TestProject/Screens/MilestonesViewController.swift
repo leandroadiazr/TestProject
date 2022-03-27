@@ -232,10 +232,12 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         guard let issuesQuestion = milestones.questions.first(where: { $0.questionName == "issues" }) else { return }
         
         configureSelectedBox(issues: issuesQuestion.selectedAnswer == "Yes" ? true : false)
-        
+        self.problemCheckBox.checkBox.isEnabled = false
+        self.noIssuesCheckBox.checkBox.isEnabled = false
         self.changeLoadedVisibility(completed: true)
         loadedSeparator.isHidden = true
         loadedPickerSeparator.isHidden = true
+        
     }
     
     private func configureSelectedBox(issues: Bool = false ) {
