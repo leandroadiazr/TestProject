@@ -8,6 +8,7 @@
 import UIKit
 import Anchorage
 import M13Checkbox
+import CoreLocation
 
 enum MilestoneType: String, CaseIterable {
     case checkIn = "CHECK_IN"
@@ -15,7 +16,10 @@ enum MilestoneType: String, CaseIterable {
     case upload = "UPLOAD"
 }
 
-class MilestonesViewController: UIViewController {
+class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
+    
+    let locationManager = CLLocationManager()
+    
     
     lazy var stopLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 16, text: "Pick 1 - Walmart Supercenter")
@@ -436,6 +440,7 @@ class MilestonesViewController: UIViewController {
         initContentViewModel()
         loadData()
         checkInSubmitButton.backgroundColor = !checkinToggleChanged ? .lightGray : .systemBlue
+        getLoacation()
         //                flushSystem()
     }
     
@@ -567,7 +572,8 @@ extension MilestonesViewController {
         guard var checkinMilestone = allMilestones.first(where: { $0.stopMilestoneType == MilestoneType.checkIn.rawValue }), !checkinMilestone.completed else { return }
         
         for question in checkinMilestone.questions {
-            if question.questionName == "CheckedInDateTime" {
+            switch question.questionName {
+            case "CheckedInDateTime":
                 guard let checkinDate = self.checkinDate else { return }
                 //MM-dd-yyyy HH:mm
                 //"MM/dd/yyyy"
@@ -577,15 +583,59 @@ extension MilestonesViewController {
                 guard let QIndex = checkinMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
                 checkinMilestone.questions.remove(at: QIndex)
                 
-                guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
-                allMilestones.remove(at: MIndex)
+//                guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
+//                allMilestones.remove(at: MIndex)
                 
                 checkinMilestone.questions.insert(currentQuestion, at: QIndex)
                 checkinMilestone.completed = true
-                allMilestones.insert(checkinMilestone, at: MIndex)
-                self.viewModel = ContentViewModel(milestones: allMilestones)
+//                allMilestones.insert(checkinMilestone, at: MIndex)
+//                self.viewModel = ContentViewModel(milestones: allMilestones)
                 
+            case "CheckedInSubmit":
+                
+    
+                guard let checkinDate = self.checkinDate else { return }
+                //MM-dd-yyyy HH:mm
+                //"MM/dd/yyyy"
+                let date = convertDateToString(date: checkinDate, format: "MM-dd-yyyy HH:mm")
+                let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: date, availableResponses: question.availableResponses)
+                
+                guard let QIndex = checkinMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
+                checkinMilestone.questions.remove(at: QIndex)
+                
+//                guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
+//                allMilestones.remove(at: MIndex)
+                
+                checkinMilestone.questions.insert(currentQuestion, at: QIndex)
+                checkinMilestone.completed = true
+            default:
+                break
             }
+            guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
+            allMilestones.remove(at: MIndex)
+            
+            allMilestones.insert(checkinMilestone, at: MIndex)
+            self.viewModel = ContentViewModel(milestones: allMilestones)
+            
+//            if question.questionName == "CheckedInDateTime" {
+//                guard let checkinDate = self.checkinDate else { return }
+//                //MM-dd-yyyy HH:mm
+//                //"MM/dd/yyyy"
+//                let date = convertDateToString(date: checkinDate, format: "MM-dd-yyyy HH:mm")
+//                let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: date, availableResponses: question.availableResponses)
+//
+//                guard let QIndex = checkinMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
+//                checkinMilestone.questions.remove(at: QIndex)
+//
+//                guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
+//                allMilestones.remove(at: MIndex)
+//
+//                checkinMilestone.questions.insert(currentQuestion, at: QIndex)
+//                checkinMilestone.completed = true
+//                allMilestones.insert(checkinMilestone, at: MIndex)
+//                self.viewModel = ContentViewModel(milestones: allMilestones)
+//
+//            }
         }
         
         self.viewModel?.checkIn(item: checkinMilestone, vc: self, completion: { saved in
@@ -677,6 +727,21 @@ extension MilestonesViewController {
             }
         }
     }
+
+    private func getLoacation() -> String {
+        if (CLLocationManager.locationServicesEnabled())
+            {
+                locationManager.delegate = self
+                locationManager.desiredAccuracy = kCLLocationAccuracyBest
+                locationManager.requestAlwaysAuthorization()
+                locationManager.startUpdatingLocation()
+            }
+        
+        print(locationManager.location)
+        
+        return String(describing: locationManager.location)
+    }
+
 }
 
 public typealias VoidClosure = () -> Void
