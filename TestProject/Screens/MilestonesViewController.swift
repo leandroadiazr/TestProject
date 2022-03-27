@@ -29,28 +29,26 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
     var viewModel: ContentViewModel? {
         didSet {
             guard let milestones = viewModel?.allMilestones else { return }
-
+            
             //MARK: CHECKIN MILESTONE
             guard let checkInMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.checkIn.rawValue }) else { return }
- 
+            
             if checkInMilestone.completed {
                 self.isCheckinCompleted(milestone: checkInMilestone)
-               
-                checkinSeparator.isHidden = true
             } else {
                 self.changeCheckinVisibility(completed: false)
                 checkinSeparator.isHidden = false
+                checkinPickerSeparator.isHidden = false
             }
-            
             
             guard let loadedMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.loaded.rawValue }) else { return }
             if loadedMilestone.completed {
                 self.isloadedCompleted(milestone: loadedMilestone)
-        
             } else {
                 self.changeLoadedVisibility(completed: false)
+                loadedSeparator.isHidden = false
+                loadedPickerSeparator.isHidden = false
             }
-            
             
             guard let uploadMilestone = milestones.first(where: { $0.stopMilestoneType == MilestoneType.upload.rawValue }) else { return }
             if uploadMilestone.completed {
@@ -60,7 +58,10 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
             }
             
             viewModel?.currentMilestone = viewModel?.allMilestones?.first(where: {$0.completed == false })
+            setCurrentMarker(milestone: viewModel?.currentMilestone)
             print("current milestone :", viewModel?.currentMilestone?.stopMilestoneType as Any)
+            
+            viewModel?.currentLocation = getLoacation()
         }
     }
     
@@ -81,6 +82,7 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         }
         self.changeCheckinVisibility(completed: true)
         checkInSubmitButton.backgroundColor = .clear
+        checkinSeparator.isHidden = true
     }
     
     
@@ -124,7 +126,7 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
     private var checkinToggleChanged: Bool = false {
         didSet {
             checkInToggle.isOn = checkinToggleChanged
-            changeCheckinVisibility(completed: !checkinToggleChanged)
+            changeCheckinVisibility(completed: checkinToggleChanged)
             checkInSubmitButton.backgroundColor = !checkinToggleChanged ? .lightGray : .systemBlue
         }
     }
@@ -197,8 +199,6 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         return view
     }()
     
-    
-    
     //MARK: - END CHECK IN
     //MARK: - END CHECK IN
     
@@ -216,7 +216,6 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
     //MARK: - LOADED
     //MARK: - LOADED
     //MARK: - LOADED
-    
     private func isloadedCompleted(milestone: LoMAT.StopMilestone) {
         loadedSeparator.isHidden = true
         loadedToggle.isOn = true
@@ -230,7 +229,24 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
             loadedDatePicker.date = convertToDate(string: date, format: "MM-dd-yyyy HH:mm")
             loadedDatePicker.isEnabled = false
         }
+        guard let issuesQuestion = milestones.questions.first(where: { $0.questionName == "issues" }) else { return }
+        
+        configureSelectedBox(issues: issuesQuestion.selectedAnswer == "Yes" ? true : false)
+        
         self.changeLoadedVisibility(completed: true)
+        loadedSeparator.isHidden = true
+        loadedPickerSeparator.isHidden = true
+    }
+    
+    private func configureSelectedBox(issues: Bool = false ) {
+        switch issues {
+        case true:
+            self.problemCheckBox.checkBox.checkState = .checked
+            self.problemCheckBox.checkBox.stateChangeAnimation = .fill
+        case false:
+            self.noIssuesCheckBox.checkBox.checkState = .checked
+            self.noIssuesCheckBox.checkBox.stateChangeAnimation = .fill
+        }
     }
     
     lazy var loadedSeparator: UIView = {
@@ -257,7 +273,7 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
     private var loadedToggleChanged: Bool = false {
         didSet {
             loadedToggle.isOn = loadedToggleChanged
-            changeLoadedVisibility(completed: !loadedToggleChanged)
+            changeLoadedVisibility(completed: loadedToggleChanged)
         }
     }
     
@@ -324,65 +340,35 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         return view
     }()
     
-    lazy var selectedCheckBoxOne: M13Checkbox = {
-        let checkbox = M13Checkbox()
-        checkbox.boxType = .circle
-        checkbox.markType = .radio
-        checkbox.checkState = .unchecked
-        checkbox.tintColor = .systemRed
-        checkbox.heightAnchor == 25
-        checkbox.widthAnchor == 25
-        checkbox.addTarget(self, action: #selector(selectedAnswerValue), for: .valueChanged)
-        checkbox.tag = 1
-        return checkbox
+    lazy var problemCheckBox: RadioButton = {
+        let button = RadioButton(fillColor: .systemRed, questionLabel: "Problems", questionImage: "hand.thumbsdown")
+        button.tag = 1
+        button.selectedAnswer = {
+            self.selectedAnswerValue(button)
+            print("seleted issues")
+        }
+        return button
     }()
     
-    lazy var thumbsImageDown: UIImageView = {
-        let view = UIImageView(image: UIImage(systemName: "hand.thumbsdown"))
-        view.tintColor = .systemRed
-        return view
+    lazy var noIssuesCheckBox: RadioButton = {
+        let button = RadioButton(fillColor: .systemBlue, questionLabel: "No Issues", questionImage: "hand.thumbsup")
+        button.tag = 2
+        button.selectedAnswer = {
+            self.selectedAnswerValue(button)
+            print("seleted issues")
+        }
+        return button
     }()
     
-    lazy var questionProblemsLabel: UILabel = {
-        let label = CustomTitleLabel(textAlignment: .left, fontSize: 11, text: "Problems")
-        label.tintColor = .systemRed
-        return label
-    }()
-    
-    lazy var selectedCheckBoxTwo: M13Checkbox = {
-        let checkbox = M13Checkbox()
-        checkbox.boxType = .circle
-        checkbox.markType = .radio
-        checkbox.checkState = .unchecked
-        checkbox.tintColor = .systemBlue
-        checkbox.heightAnchor == 25
-        checkbox.widthAnchor == 25
-        checkbox.tag = 2
-        checkbox.addTarget(self, action: #selector(selectedAnswerValue), for: .valueChanged)
-        return checkbox
-    }()
-    
-    lazy var thumbsImageUp: UIImageView = {
-        let view = UIImageView(image: UIImage(systemName: "hand.thumbsup"))
-        view.tintColor = .systemBlue
-        return view
-    }()
-    
-    lazy var questionNoIssuesLabel: UILabel = {
-        let label = CustomTitleLabel(textAlignment: .left, fontSize: 11, text: "No Issues")
-        label.tintColor = .systemBlue
-        return label
-    }()
-    
-    @objc private func selectedAnswerValue(_ box: M13Checkbox) {
+    @objc private func selectedAnswerValue(_ box: RadioButton) {
         switch box.tag {
         case 1:
-            selectedCheckBoxOne.stateChangeAnimation = .fill
-            selectedCheckBoxTwo.checkState = .unchecked
+            problemCheckBox.checkBox.stateChangeAnimation = .fill
+            noIssuesCheckBox.checkBox.checkState = .unchecked
             selectedAnswer = "Yes"
         case 2:
-            selectedCheckBoxTwo.stateChangeAnimation = .fill
-            selectedCheckBoxOne.checkState = .unchecked
+            noIssuesCheckBox.checkBox.stateChangeAnimation = .fill
+            problemCheckBox.checkBox.checkState = .unchecked
             selectedAnswer = "No"
         default:
             break
@@ -399,13 +385,8 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         let stack = UIView()
         stack.addSubview(loadedQuestionSeparator)
         stack.addSubview(loadedMainQuestionTitle)
-        stack.addSubview(selectedCheckBoxOne)
-        stack.addSubview(thumbsImageDown)
-        stack.addSubview(questionProblemsLabel)
-        
-        stack.addSubview(selectedCheckBoxTwo)
-        stack.addSubview(thumbsImageUp)
-        stack.addSubview(questionNoIssuesLabel)
+        stack.addSubview(problemCheckBox)
+        stack.addSubview(noIssuesCheckBox)
         stack.backgroundColor = .white
         stack.layer.borderWidth = 0.2
         return stack
@@ -429,21 +410,23 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
     }()
     
     
-    
     //MARK: -- LIFE CYCLE
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubview(selectedCheckBoxOne)
         title = "Work Flow"
         view.backgroundColor = .systemGray6
         configure()
         initContentViewModel()
-        loadData()
-        checkInSubmitButton.backgroundColor = !checkinToggleChanged ? .lightGray : .systemBlue
-        getLoacation()
-        //                flushSystem()
+        
+        //                        flushSystem()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadData()
+        checkInSubmitButton.backgroundColor = !checkinToggleChanged ? .clear : .systemBlue
+        loadedSubmitButton.backgroundColor = !loadedToggleChanged ? .clear : .systemBlue
+    }
     
     private func flushSystem() {
         for milestone in self.viewModel!.allMilestones! {
@@ -454,21 +437,17 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     private func changeCheckinVisibility(completed: Bool = false) {
-                self.deleteButton.isHidden = !completed
-
+        self.deleteButton.isHidden = !completed
         checkInDateLabel.isHidden = !completed
         checkInDatePicker.isHidden = !completed
         checkInDatePickerView.isHidden = !completed
-        checkinSeparator.isHidden = completed
-        checkinPickerSeparator.isHidden = completed
     }
     
     private func changeLoadedVisibility(completed: Bool = false) {
         self.deleteButton.isHidden = !completed
-        loadedSeparator.isHidden = completed
-        loadedPickerSeparator.isHidden = completed
         loadedDateLabel.isHidden = !completed
         loadedDatePicker.isHidden = !completed
+        loadedDatePickerView.isHidden = !completed
     }
     
     private func initContentViewModel() {
@@ -507,6 +486,27 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
+    private func setCurrentMarker(milestone: LoMAT.StopMilestone?) {
+        let separators = [checkinSeparator, checkinPickerSeparator, loadedSeparator, loadedPickerSeparator, loadedQuestionSeparator]
+        for item in separators {
+            item.isHidden = true
+        }
+        
+        switch milestone?.stopMilestoneType {
+        case "CHECK_IN":
+            checkinSeparator.isHidden = false
+            checkinPickerSeparator.isHidden = false
+        case "LOADED":
+            loadedSeparator.isHidden = false
+            loadedPickerSeparator.isHidden = false
+            loadedQuestionSeparator.isHidden = false
+        case "UPLOAD":
+            break
+        default:
+            break
+        }
+    }
+    
     private func configure() {
         view.addSubview(stopLabel)
         view.addSubview(checkInView)
@@ -519,9 +519,6 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         view.addSubview(loadedSubmitButton)
         setupConstraints()
     }
-    
-    
-    
 }
 
 //MARK: - Actions
@@ -582,60 +579,28 @@ extension MilestonesViewController {
                 
                 guard let QIndex = checkinMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
                 checkinMilestone.questions.remove(at: QIndex)
-                
-//                guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
-//                allMilestones.remove(at: MIndex)
-                
                 checkinMilestone.questions.insert(currentQuestion, at: QIndex)
-                checkinMilestone.completed = true
-//                allMilestones.insert(checkinMilestone, at: MIndex)
-//                self.viewModel = ContentViewModel(milestones: allMilestones)
-                
             case "CheckedInSubmit":
+                guard let currentLocation = self.viewModel?.currentLocation else { return }
+                let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: currentLocation, availableResponses: question.availableResponses)
+                guard let QuestionIndex = checkinMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
+                checkinMilestone.questions.remove(at: QuestionIndex)
                 
-    
-                guard let checkinDate = self.checkinDate else { return }
-                //MM-dd-yyyy HH:mm
-                //"MM/dd/yyyy"
-                let date = convertDateToString(date: checkinDate, format: "MM-dd-yyyy HH:mm")
-                let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: date, availableResponses: question.availableResponses)
-                
-                guard let QIndex = checkinMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
-                checkinMilestone.questions.remove(at: QIndex)
-                
-//                guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
-//                allMilestones.remove(at: MIndex)
-                
-                checkinMilestone.questions.insert(currentQuestion, at: QIndex)
+                checkinMilestone.questions.insert(currentQuestion, at: QuestionIndex)
                 checkinMilestone.completed = true
+                
             default:
                 break
             }
-            guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
-            allMilestones.remove(at: MIndex)
             
-            allMilestones.insert(checkinMilestone, at: MIndex)
+            //UPDATE MILESTONE
+            print(checkinMilestone)
+            guard let MilestoneIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
+            allMilestones.remove(at: MilestoneIndex)
+            
+            allMilestones.insert(checkinMilestone, at: MilestoneIndex)
+            checkinMilestone.completed = true
             self.viewModel = ContentViewModel(milestones: allMilestones)
-            
-//            if question.questionName == "CheckedInDateTime" {
-//                guard let checkinDate = self.checkinDate else { return }
-//                //MM-dd-yyyy HH:mm
-//                //"MM/dd/yyyy"
-//                let date = convertDateToString(date: checkinDate, format: "MM-dd-yyyy HH:mm")
-//                let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: date, availableResponses: question.availableResponses)
-//
-//                guard let QIndex = checkinMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
-//                checkinMilestone.questions.remove(at: QIndex)
-//
-//                guard let MIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == checkinMilestone.stopMilestoneType }) else { return }
-//                allMilestones.remove(at: MIndex)
-//
-//                checkinMilestone.questions.insert(currentQuestion, at: QIndex)
-//                checkinMilestone.completed = true
-//                allMilestones.insert(checkinMilestone, at: MIndex)
-//                self.viewModel = ContentViewModel(milestones: allMilestones)
-//
-//            }
         }
         
         self.viewModel?.checkIn(item: checkinMilestone, vc: self, completion: { saved in
@@ -670,7 +635,6 @@ extension MilestonesViewController {
         guard loadedMilestone.stopMilestoneType == MilestoneType.loaded.rawValue && !loadedMilestone.completed else { return }
         
         
-        
         for question in loadedMilestone.questions {
             switch question.questionName {
             case "LoadedTime":
@@ -682,36 +646,20 @@ extension MilestonesViewController {
                 
                 guard let QuestionIndex = loadedMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
                 loadedMilestone.questions.remove(at: QuestionIndex)
+                loadedMilestone.questions.insert(currentQuestion, at: QuestionIndex)
+            case "issues":
+                guard selectedAnswer != nil else {
+                    self.customAlert(title: "Choose an answer", message: "Were there any issues?", buttonTitle: "Ok")
+                    return
+                }
                 
-                guard let MilestoneIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == loadedMilestone.stopMilestoneType }) else { return }
-                allMilestones.remove(at: MilestoneIndex)
+                let currentQuestion = LoMAT.Question(id: question.id, descendants: question.descendants, questionName: question.questionName, questionType: question.questionType, style: question.style, header: question.header, questionText: question.questionText, mobileDisplayData: question.mobileDisplayData, selectedAnswer: selectedAnswer, availableResponses: question.availableResponses)
+                guard let QuestionIndex = loadedMilestone.questions.firstIndex(where: {$0.questionName == question.questionName }) else { return }
+                loadedMilestone.questions.remove(at: QuestionIndex)
                 
                 loadedMilestone.questions.insert(currentQuestion, at: QuestionIndex)
                 loadedMilestone.completed = true
-                allMilestones.insert(loadedMilestone, at: MilestoneIndex)
-                self.viewModel = ContentViewModel(milestones: allMilestones)
                 
-                
-                self.viewModel?.checkIn(item: loadedMilestone, vc: self, completion: { saved in
-                    switch saved {
-                    case true:
-                        self.deleteButton.isHidden = false
-                        self.loadedToggle.isEnabled = false
-                        self.loadedDatePicker.isEnabled = false
-                        self.loadedSubmitButton.setTitle("Submitted", for: .normal)
-                        self.loadedSubmitButton.setTitleColor(.systemBlue, for: .disabled)
-                        self.loadedSubmitButton.backgroundColor = .clear
-                        self.loadedSubmitButton.isEnabled = false
-                        self.viewModel?.currentMilestone = self.viewModel?.allMilestones?.first(where: { $0.completed == false })
-                        print("Next milestone = ", self.viewModel?.currentMilestone)
-                    case false:
-                        self.customAlert(title: "Ehh something is wrong", message: "not saved", buttonTitle: "Try again..")
-                        break
-                    }
-                })
-                
-            case "issues":
-                break
             case "CommodityConfirm":
                 break
             case "ConfirmNextStop":
@@ -725,23 +673,50 @@ extension MilestonesViewController {
             case .some(_):
                 break
             }
+            
         }
+        
+        guard let MilestoneIndex = allMilestones.firstIndex(where: {$0.stopMilestoneType == loadedMilestone.stopMilestoneType }) else { return }
+        allMilestones.remove(at: MilestoneIndex)
+        
+        allMilestones.insert(loadedMilestone, at: MilestoneIndex)
+        loadedMilestone.completed = true
+        self.viewModel = ContentViewModel(milestones: allMilestones)
+        
+        
+        self.viewModel?.checkIn(item: loadedMilestone, vc: self, completion: { saved in
+            switch saved {
+            case true:
+                self.deleteButton.isHidden = false
+                self.loadedToggle.isEnabled = false
+                self.loadedDatePicker.isEnabled = false
+                self.loadedSubmitButton.setTitle("Submitted", for: .normal)
+                self.loadedSubmitButton.setTitleColor(.systemBlue, for: .disabled)
+                self.loadedSubmitButton.backgroundColor = .clear
+                self.loadedSubmitButton.isEnabled = false
+                self.viewModel?.currentMilestone = self.viewModel?.allMilestones?.first(where: { $0.completed == false })
+                print("Next milestone = ", self.viewModel?.currentMilestone as? Any)
+            case false:
+                self.customAlert(title: "Ehh something is wrong", message: "not saved", buttonTitle: "Try again..")
+                break
+            }
+        })
     }
-
+    
     private func getLoacation() -> String {
         if (CLLocationManager.locationServicesEnabled())
-            {
-                locationManager.delegate = self
-                locationManager.desiredAccuracy = kCLLocationAccuracyBest
-                locationManager.requestAlwaysAuthorization()
-                locationManager.startUpdatingLocation()
-            }
+        {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestAlwaysAuthorization()
+            locationManager.startUpdatingLocation()
+        }
         
         print(locationManager.location)
         
         return String(describing: locationManager.location)
     }
-
+    
 }
 
 public typealias VoidClosure = () -> Void
@@ -790,14 +765,11 @@ extension MilestonesViewController {
         loadedView.topAnchor == checkInSubmitButton.bottomAnchor + padding
         loadedView.horizontalAnchors == view.horizontalAnchors
         loadedView.heightAnchor == 70
-        //        loadedView.heightAnchor == 200
         
         loadedSeparator.verticalAnchors == loadedView.verticalAnchors
-        //        loadedSeparator.leadingAnchor == view.leadingAnchor
         
         loadedLabelSwitchStack.centerYAnchor == loadedView.centerYAnchor
         loadedLabelSwitchStack.horizontalAnchors == loadedView.horizontalAnchors + padding
-        
         
         //date picker view
         loadedDatePickerView.topAnchor == loadedView.bottomAnchor
@@ -818,30 +790,18 @@ extension MilestonesViewController {
         loadedQuestionStack.horizontalAnchors == loadedView.horizontalAnchors
         loadedQuestionStack.heightAnchor == 100
         
-        
         loadedMainQuestionTitle.topAnchor == loadedQuestionStack.topAnchor + 5
         loadedMainQuestionTitle.leadingAnchor == loadedView.leadingAnchor + padding
         
         loadedQuestionSeparator.verticalAnchors == loadedQuestionStack.verticalAnchors
         
-        selectedCheckBoxOne.centerYAnchor == loadedQuestionStack.centerYAnchor
-        selectedCheckBoxOne.leadingAnchor == loadedQuestionStack.leadingAnchor + padding * 2
+        problemCheckBox.centerYAnchor == loadedQuestionStack.centerYAnchor
+        problemCheckBox.leadingAnchor == loadedQuestionStack.leadingAnchor + padding
+        problemCheckBox.heightAnchor == 50
         
-        thumbsImageDown.leadingAnchor == selectedCheckBoxOne.trailingAnchor + padding
-        thumbsImageDown.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        questionProblemsLabel.leadingAnchor == thumbsImageDown.trailingAnchor + padding
-        questionProblemsLabel.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        
-        selectedCheckBoxTwo.leadingAnchor == loadedQuestionStack.centerXAnchor + padding
-        selectedCheckBoxTwo.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        thumbsImageUp.leadingAnchor == selectedCheckBoxTwo.trailingAnchor + padding
-        thumbsImageUp.centerYAnchor == loadedQuestionStack.centerYAnchor
-        
-        questionNoIssuesLabel.leadingAnchor == thumbsImageUp.trailingAnchor + padding
-        questionNoIssuesLabel.centerYAnchor == loadedQuestionStack.centerYAnchor
+        noIssuesCheckBox.leadingAnchor == loadedQuestionStack.centerXAnchor + padding
+        noIssuesCheckBox.centerYAnchor == loadedQuestionStack.centerYAnchor
+        noIssuesCheckBox.heightAnchor == 50
         
         loadedSubmitButton.topAnchor == loadedQuestionStack.bottomAnchor + 10
         loadedSubmitButton.centerXAnchor == view.centerXAnchor

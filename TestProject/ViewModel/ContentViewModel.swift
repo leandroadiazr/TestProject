@@ -14,6 +14,7 @@ class ContentViewModel {
     var currentMilestone: LoMAT.StopMilestone?
     var questions: [LoMAT.Question]?
     var questionType: LoMAT.Question?
+    var currentLocation: String?
     
     init(milestones: [LoMAT.StopMilestone]?) {
         if let milestones = milestones {
@@ -22,8 +23,6 @@ class ContentViewModel {
                 self.questions?.append(contentsOf: milestone.questions)
             }
         }
-//        self.currentMilestone = milestones?.first(where: {$0.completed == false })
-        print(currentMilestone)
     }
     
     
@@ -64,4 +63,7 @@ class ContentViewModel {
             completion(false)
         }
     }
+    
+    
+    
 }
