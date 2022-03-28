@@ -1,91 +1,97 @@
-////
-////  BinaryView.swift
-////  TestProject
-////
-////  Created by LeandroDiaz on 3/23/22.
-////
 //
-//import UIKit
-//import Anchorage
-//import M13Checkbox
+//  BinaryView.swift
+//  TestProject
 //
-//class BinaryView: UIView {
-//    
-//    lazy var selectedCheckBox: M13Checkbox = {
-//       let checkbox = M13Checkbox()
-//        checkbox.boxType = .circle
-//        checkbox.markType = .radio
-//        checkbox.checkState = .unchecked
-//        checkbox.tintColor = .red
-//        checkbox.backgroundColor = .yellow
-//        return checkbox
-//    }()
-//    
-//    let viewTitle = CustomTitleLabel(textAlignment: .left, fontSize: 14, text: "Were there any issues?")
-//    
-////    lazy var radioButton: RadioButton = {
-////        let radio = RadioButton(backgroundColor: .clear)
-////        radio.translatesAutoresizingMaskIntoConstraints = false
-//////        radio.layer.cornerRadius = 15
-////        return radio
-////    }()
-//    
-//    lazy var thumbsImage: UIImageView = {
-//        let view = UIImageView(image: UIImage(systemName: "thumbsup"))
-//        return view
-//    }()
-//    
-//    lazy var questionLabel: UILabel = {
-//        let label = CustomTitleLabel(textAlignment: .left, fontSize: 11, text: "")
-//        return label
-//    }()
-//    
-//    
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//        configure()
-//    }
-//    
-//    convenience init(title: String, questionText: String) {
-//        self.init(frame: .zero)
-//        self.viewTitle.text = title
-//        self.questionLabel.text = questionText
-////        self.textAlignment = textAlignment
-////        self.font = UIFont.systemFont(ofSize: fontSize, weight: .bold)
-////        self.text = text
-//    }
-//    
-//    
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//    
-//    private func configure() {
-//    addSubview(selectedCheckBox)
-//        addSubview(thumbsImage)
-//        addSubview(questionLabel)
-//         
-//        setupConstraints()
-//    }
-//    
-//    
-//    private func setupConstraints() {
-//        let padding: CGFloat = 20
-//        
-//        selectedCheckBox.topAnchor == topAnchor + padding
-//        selectedCheckBox.centerYAnchor == centerYAnchor
-//        selectedCheckBox.leadingAnchor == leadingAnchor + 10
-//        selectedCheckBox.heightAnchor == 20
-//        selectedCheckBox.widthAnchor == 20
-//        
-//        thumbsImage.leadingAnchor == selectedCheckBox.trailingAnchor + padding
-//        thumbsImage.centerYAnchor == selectedCheckBox.centerYAnchor
-////        thumbsImage.widthAnchor == 30
-////        thumbsImage.heightAnchor == 30
-////        
-//        questionLabel.leadingAnchor == thumbsImage.trailingAnchor + padding
-//        questionLabel.widthAnchor == 100
-//        
-//    }
-//    
-//}
+//  Created by LeandroDiaz on 3/23/22.
+//
+
+import UIKit
+import Anchorage
+import M13Checkbox
+
+class BinaryView: UIView {
+    var buttonAction: (() -> Void)?
+    
+    lazy var mainQuestionLabel: UILabel = {
+        let label = CustomTitleLabel(textAlignment: .left, fontSize: 14, text: "")
+        return label
+    }()
+    
+    lazy var subtitleLabel: UILabel = {
+        let label = CustomSubTitleLabel(fontSize: 12, backgroundColor: .clear, text: "")
+        return label
+    }()
+    
+
+    var checkBoxOne = RadioButton(fillColor: .systemRed, questionLabel: "", questionImage: "hand.thumbsdown")
+
+    var checkBoxTwo = RadioButton(fillColor: .systemBlue, questionLabel: "", questionImage: "hand.thumbsdown")
+
+    
+    lazy var stackView: UIStackView = {
+        let view = UIStackView(arrangedSubviews: [checkBoxOne, checkBoxTwo])
+        checkBoxOne.checkBox.addTarget(self, action: #selector(answer(_:)), for: .valueChanged)
+        checkBoxOne.checkBox.tag = 1
+        checkBoxTwo.checkBox.addTarget(self, action: #selector(answer(_:)), for: .valueChanged)
+        checkBoxTwo.checkBox.tag = 2
+        view.axis = .horizontal
+        view.distribution = .equalSpacing
+        return view
+    }()
+    
+    init(frame: CGRect, mainQuestionTitle: String, subtitleLabel: String?, boxOneFillCollor: UIColor, boxOneText: String, boxOneImage: String, boxTwoFillCollor: UIColor, boxTwoText: String, boxTwoImage: String) {
+        super.init(frame: frame)
+        self.mainQuestionLabel.text = mainQuestionTitle
+        self.subtitleLabel.text = subtitleLabel ?? ""
+        self.checkBoxOne = RadioButton(fillColor: boxOneFillCollor, questionLabel: boxOneText, questionImage: boxOneImage)
+        self.checkBoxTwo = RadioButton(fillColor: boxTwoFillCollor, questionLabel: boxTwoText, questionImage: boxTwoImage)
+        configure()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func answer(_ box: RadioButton) {
+        print("working")
+        buttonAction?()
+        changeState(box)
+    }
+    
+    @objc private func changeState(_ box: RadioButton) {
+        print("called?", box.tag)
+        switch box.tag {
+        case 1:
+            checkBoxOne.checkBox.stateChangeAnimation = .fill
+            checkBoxTwo.checkBox.checkState = .unchecked
+        case 2:
+            checkBoxTwo.checkBox.stateChangeAnimation = .fill
+            checkBoxOne.checkBox.checkState = .unchecked
+        default:
+            break
+        }
+    }
+    
+    private func configure() {
+        addSubview(mainQuestionLabel)
+        addSubview(subtitleLabel)
+        addSubview(stackView)
+        setupConstraints()
+    }
+    
+    
+    private func setupConstraints() {
+        let padding: CGFloat = 20
+        mainQuestionLabel.topAnchor == topAnchor + padding
+        mainQuestionLabel.horizontalAnchors == horizontalAnchors + padding
+        
+        subtitleLabel.topAnchor == mainQuestionLabel.bottomAnchor
+        subtitleLabel.horizontalAnchors == mainQuestionLabel.horizontalAnchors
+        
+        stackView.topAnchor == subtitleLabel.bottomAnchor
+        stackView.horizontalAnchors == horizontalAnchors + padding
+        stackView.heightAnchor == 50
+        
+    }
+    
+}

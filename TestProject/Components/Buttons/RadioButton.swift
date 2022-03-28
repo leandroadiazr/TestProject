@@ -18,13 +18,14 @@ class RadioButton: UIView {
         checkbox.boxType = .circle
         checkbox.markType = .radio
         checkbox.checkState = .unchecked
+        checkbox.stateChangeAnimation = .fill
         checkbox.heightAnchor == 25
         checkbox.widthAnchor == 25
         checkbox.addTarget(self, action: #selector(answer), for: .valueChanged)
         return checkbox
     }()
     
-    private var questionLabel: UILabel = {
+    lazy var questionLabel: UILabel = {
         let label = CustomTitleLabel(textAlignment: .left, fontSize: 13, text: "")
         return label
     }()
@@ -70,6 +71,7 @@ class RadioButton: UIView {
     }
     
     @objc private func answer() {
+        print("Are you calling ?")
         selectedAnswer?()
     }
     
@@ -84,11 +86,5 @@ class RadioButton: UIView {
         questionLabel.leadingAnchor == questionImage.trailingAnchor + padding
         questionLabel.trailingAnchor == trailingAnchor - padding
         questionLabel.centerYAnchor == centerYAnchor
-//        checkBox.verticalAnchors == verticalAnchors
-        
-        
-//        heightAnchor == 50
-//        widthAnchor == 150
     }
-    
 }

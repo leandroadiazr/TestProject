@@ -362,7 +362,8 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         return button
     }()
     
-    @objc private func selectedAnswerValue(_ box: RadioButton) {
+    @objc private func selectedAnswerValue(_ box: AnyObject) {
+        print("Selecting ", box.tag)
         switch box.tag {
         case 1:
             problemCheckBox.checkBox.stateChangeAnimation = .fill
@@ -392,6 +393,24 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         stack.backgroundColor = .white
         stack.layer.borderWidth = 0.2
         return stack
+    }()
+    
+    //MARK: - Comodity Question
+    lazy var comodityQuestion: BinaryView = {
+        let view = BinaryView(frame: .zero, mainQuestionTitle: "Confirm Comodity", subtitleLabel: "24 Shelving Units", boxOneFillCollor: .systemRed, boxOneText: "No", boxOneImage: "hand.thumbsdown", boxTwoFillCollor: .systemBlue, boxTwoText: "Yes", boxTwoImage: "hand.thumbsup")
+        view.backgroundColor = .white
+        view.buttonAction = {
+            if view.checkBoxOne.checkBox.tag == 1 {
+                self.selectedAnswerValue(view.checkBoxOne.checkBox)
+            } else if view.checkBoxTwo.checkBox.tag == 2 {
+                self.selectedAnswerValue(view.checkBoxTwo.checkBox)
+            }
+        }
+//
+//
+//        view.checkBoxOne.buttonAction = {
+//        }
+        return view
     }()
     
     //MARK: - Loaded Submit Button
@@ -518,6 +537,7 @@ class MilestonesViewController: UIViewController, CLLocationManagerDelegate {
         view.addSubview(loadedView)
         view.addSubview(loadedDatePickerView)
         view.addSubview(loadedQuestionStack)
+        view.addSubview(comodityQuestion)
         view.addSubview(loadedSubmitButton)
         setupConstraints()
     }
@@ -786,8 +806,9 @@ extension MilestonesViewController {
         loadedDatePicker.centerYAnchor == loadedDatePickerView.centerYAnchor
         
         
-        //questions
+        //MARK: - Questions
         
+        //MARK: Issies
         loadedQuestionStack.topAnchor == loadedDatePickerView.bottomAnchor
         loadedQuestionStack.horizontalAnchors == loadedView.horizontalAnchors
         loadedQuestionStack.heightAnchor == 100
@@ -805,7 +826,15 @@ extension MilestonesViewController {
         noIssuesCheckBox.centerYAnchor == loadedQuestionStack.centerYAnchor
         noIssuesCheckBox.heightAnchor == 50
         
-        loadedSubmitButton.topAnchor == loadedQuestionStack.bottomAnchor + 10
+        
+        //MARK: Comodity
+        
+        comodityQuestion.topAnchor == loadedQuestionStack.bottomAnchor + 5
+        comodityQuestion.horizontalAnchors == view.horizontalAnchors
+        comodityQuestion.heightAnchor == 120
+        
+        
+        loadedSubmitButton.topAnchor == comodityQuestion.bottomAnchor + 10
         loadedSubmitButton.centerXAnchor == view.centerXAnchor
         loadedSubmitButton.widthAnchor == 100
         
